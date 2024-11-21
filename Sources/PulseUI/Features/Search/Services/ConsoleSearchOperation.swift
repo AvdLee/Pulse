@@ -36,6 +36,11 @@ final class ConsoleSearchOperation {
          parameters: ConsoleSearchParameters,
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
+        /// We iterate over the object IDs in reverse order to ensure we consider new results first.
+        /// This allows us to cancel this search operation as soon as we indicated new search results exist and
+        /// show the "New Results Available"-button in the UI.
+        let entities = Array(entities.reversed())
+        
         self.entities = entities
         self.objectIDs = entities.map(\.objectID)
         self.parameters = parameters

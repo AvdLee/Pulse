@@ -64,7 +64,16 @@ struct ConsoleSearchResultsListContentView: View {
                     viewModel.didScroll(to: result)
                 }
         }
-        if !viewModel.isSearching && !viewModel.hasMore && !viewModel.results.isEmpty {
+        if viewModel.isNewResultsButtonShown {
+            Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
+                Text("Show New Results")
+                    .frame(maxWidth: .infinity, minHeight: 24, alignment: .center)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .listRowSeparator(.hidden, edges: .bottom)
+            }
+            .buttonStyle(.link)
+        } else if !viewModel.isSearching && !viewModel.hasMore && !viewModel.results.isEmpty {
             Text("No more results")
                 .frame(maxWidth: .infinity, minHeight: 24, alignment: .center)
                 .font(.footnote)

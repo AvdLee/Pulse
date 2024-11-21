@@ -28,7 +28,7 @@ struct ConsoleSearchToolbar: View {
                 Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
                     Text("Show New Results")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.primary)
                 }
                 .buttonStyle(.link)
                 .padding(.leading, 16)

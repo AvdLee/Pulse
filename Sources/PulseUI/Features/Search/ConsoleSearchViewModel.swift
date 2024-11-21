@@ -151,6 +151,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         switch event {
         case .refresh:
             refreshNow()
+        case .update where source.entities.isEmpty && !results.isEmpty:
+            /// Results have been removed, clear search results accordingly.
+            refreshNow()
         case .update:
             checkForNewSearchMatches(for: source.entities)
         }
@@ -207,7 +210,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard isSearchActive else {
             return // Off-screen
         }
-        guard operation == nil && refreshResultsOperation == nil else {
+        guard refreshResultsOperation == nil else {
             return // Let's wait until the next refresh
         }
         guard !isNewResultsButtonShown else {
@@ -237,11 +240,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 self.results += results
             }
         } else if operation === self.refreshResultsOperation {
-            // If the first element changed, that should be enough of the
+            // If the last element changed, that should be enough of the
             // indicator that there are new search matches. We can assume
             // that the messages are only ever inserted at the top and skip
             // a ton of work.
-            if results.first?.entity.objectID !== self.results.first?.entity.objectID {
+            if results.last?.entity.objectID !== self.results.last?.entity.objectID {
                 withAnimation {
                     self.isNewResultsButtonShown = true
                 }
