@@ -29,10 +29,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         didSet { os_log("Set servers: %{private}@", log: log, "\(servers.map { $0.name ?? "" })") }
     }
 
-    @AppStorage("com-github-kean-pulse-is-remote-logger-enabled")
     public private(set) var isEnabled = false
-
-    @AppStorage("com-github-kean-pulse-selected-server")
     private var preferredServer = ""
 
     /// The servers that you previously connected to. The logger will prioritize
@@ -83,9 +80,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard let serverVersion = serverVersion else { return false }
         return serverVersion >= Version(4, 0, 0)
     }
-
-    @AppStorage("com-github-kean-pulse-known-servers")
-    private var savedKnownServers = "[]"
 
     public enum ConnectionError: Error, LocalizedError {
         case network(NWError)
@@ -140,9 +134,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private init() {
-        let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
-        self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
-
+//        let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
+//        self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
+        /// RocketSim Custom Logging:
+        let isLogEnabled = ProcessInfo.processInfo.arguments.contains("com.swiftlee.rocketsim.debug")
+        self.log = isLogEnabled ? OSLog(subsystem: "com.swiftlee.rocketsim", category: "RocketSim.RemoteLogger") : .disabled
+        
         self.knownServers = getKnownServers()
 
         os_log("Did init with known servers: %{private}@", log: log, knownServers.debugDescription)
@@ -154,6 +151,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             self.saveKnownServers()
             self.preferredServer = ""
         }
+        
+        /// Custom RocketSim code to ensure known servers is always set to RocketSim.
+        self.knownServers = ["RocketSim"]
     }
 
     /// Enables remote logging. The logger will start searching for available
@@ -670,13 +670,11 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // MARK: Persistence
 
     private func getKnownServers() -> [String] {
-        let data = self.savedKnownServers.data(using: .utf8) ?? Data()
-        return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        ["RocketSim"]
     }
 
     private func saveKnownServers() {
-        guard let data = try? JSONEncoder().encode(knownServers) else { return }
-        self.savedKnownServers = String(data: data, encoding: .utf8) ?? "[]"
+        // No longer needed since we always return RocketSim.
     }
 
 }
