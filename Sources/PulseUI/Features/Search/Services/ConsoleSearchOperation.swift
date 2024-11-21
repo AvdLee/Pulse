@@ -36,11 +36,6 @@ final class ConsoleSearchOperation {
          parameters: ConsoleSearchParameters,
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
-        /// We iterate over the object IDs in reverse order to ensure we consider new results first.
-        /// This allows us to cancel this search operation as soon as we indicated new search results exist and
-        /// show the "New Results Available"-button in the UI.
-        let entities = Array(entities.reversed())
-        
         self.entities = entities
         self.objectIDs = entities.map(\.objectID)
         self.parameters = parameters
@@ -67,8 +62,8 @@ final class ConsoleSearchOperation {
         var found = 0
         var hasMore = false
         while index < objectIDs.count, !isCancelled, !hasMore {
-            let currentMatchIndex = index
-            if let entity = try? self.context.existingObject(with: objectIDs[index]),
+            let currentMatchIndex = objectIDs.count - 1 - index
+            if let entity = try? self.context.existingObject(with: objectIDs[currentMatchIndex]),
                let occurrences = self.search(entity, parameters: parameters) {
                 found += 1
                 if found > cutoff {
@@ -76,7 +71,9 @@ final class ConsoleSearchOperation {
                     index -= 1
                 } else {
                     DispatchQueue.main.async {
-                        self.delegate?.searchOperation(self, didAddResults: [ConsoleSearchResultViewModel(entity: self.entities[currentMatchIndex], occurrences: occurrences)])
+                        self.delegate?.searchOperation(self, didAddResults: [
+                            ConsoleSearchResultViewModel(entity: self.entities[currentMatchIndex], occurrences: occurrences)
+                        ])
                     }
                 }
             }

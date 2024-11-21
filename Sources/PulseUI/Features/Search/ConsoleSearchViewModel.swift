@@ -244,7 +244,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             // indicator that there are new search matches. We can assume
             // that the messages are only ever inserted at the top and skip
             // a ton of work.
-            if results.last?.entity.objectID !== self.results.last?.entity.objectID {
+            if results.last?.entity.objectID !== self.results.first?.entity.objectID {
                 withAnimation {
                     self.isNewResultsButtonShown = true
                 }
