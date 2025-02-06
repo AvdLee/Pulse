@@ -137,7 +137,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 //        let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
 //        self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         /// RocketSim Custom Logging:
-        let isLogEnabled = ProcessInfo.processInfo.arguments.contains("com.swiftlee.rocketsim.debug")
+        let isLogEnabled = ProcessInfo.processInfo.arguments.contains("-com.swiftlee.rocketsim.debug")
         self.log = isLogEnabled ? OSLog(subsystem: "com.swiftlee.rocketsim", category: "RocketSim.RemoteLogger") : .disabled
         
         self.knownServers = getKnownServers()
@@ -225,6 +225,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             browserError = error
         case .failed(let error):
             os_log("Browser failed with error: %{public}@", log: log, type: .error, error.debugDescription)
+            NSLog("RocketSim Connect failed (1) with error: \(error.localizedDescription). Make sure to enable RocketSim: System → Privacy → Local Network → Turn RocketSim on. If the issue remains, please contact support@rocketsim.app.")
             browserError = error
             scheduleBrowserRetry()
         case .ready:
@@ -382,6 +383,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             connectionError = nil
         case .failed(let error):
             os_log("Connection failed with error: %{public}@", log: log, type: .error, error.debugDescription)
+            NSLog("RocketSim Connect failed (2) with error: \(error.localizedDescription). Make sure to enable RocketSim: System → Privacy → Local Network → Turn RocketSim on. If the issue remains, please contact support@rocketsim.app.")
             connectionError = .network(error)
             connectionState = .disconnected
             scheduleConnectionRetry()
