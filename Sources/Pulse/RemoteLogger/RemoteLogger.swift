@@ -262,17 +262,19 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard selectedServerName == nil else { return }
 
         var servers: [String: NWBrowser.Result] = [:]
-        for server in self.servers where server.name != nil {
-            servers[server.name!] = server
+        for server in self.servers {
+            guard let serverName = server.name else { continue }
+            servers[serverName] = server
         }
-
-        guard let name = self.knownServers.first(where: { servers[$0] != nil }),
-              let server = servers[name] else {
+        
+        let rocketSimServers = servers.filter { $0.key.lowercased().contains("rocketsim") }
+        guard let preferredServer = rocketSimServers.preferredRocketSimServer() else {
+            os_log("Failed to find a preferred server out of RocketSim Servers: ${public}@", log: log, rocketSimServers)
             return
         }
-
-        os_log("Will autoconnect to server: %{private}@", log: log, name)
-        connect(to: server, passcode: server.name.flatMap(getPasscode))
+        
+        os_log("Will autoconnect to RocketSim server: %{private}@", log: log, preferredServer.0)
+        connect(to: preferredServer.1, passcode: getPasscode(forServerNamed: "RocketSim"))
     }
 
     private func stopBrowser() {
@@ -731,4 +733,29 @@ extension RemoteLogger.ConnectionState {
 
 extension RemoteLogger {
     public static var serviceType = "_pulse._tcp"
+}
+
+extension [String: NWBrowser.Result] {
+    func preferredRocketSimServer() -> (String, NWBrowser.Result)? {
+        let baseName = "rocketsim"
+        var highestNumber: Int?
+        var matchResult: (String, NWBrowser.Result)?
+        
+        for (name, result) in self {
+            let serverName = name.lowercased()
+            if serverName == baseName {
+                if matchResult == nil {
+                    matchResult = (name, result) // default to base name
+                }
+            } else if let match = serverName.range(of: #"^\#(baseName) \((\d+)\)$"#, options: .regularExpression) {
+                let numberString = String(serverName[match]).dropFirst(baseName.count + 2).dropLast()
+                if let number = Int(numberString), number > (highestNumber ?? -1) {
+                    highestNumber = number
+                    matchResult = (name, result)
+                }
+            }
+        }
+        
+        return matchResult
+    }
 }
