@@ -40,8 +40,6 @@ private struct ConsoleMainView: View {
     @State private var isShowingSessions = false
     @State private var isShowingSettings = false
 
-    @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
-
     var body: some View {
         HSplitView {
             contentView
@@ -89,9 +87,6 @@ private struct ConsoleMainView: View {
     @ViewBuilder
     private var contentToolbarNavigationItems: some View {
         if !(environment.store.options.contains(.readonly)) {
-            Toggle(isOn: $isNowEnabled) {
-                Image(systemName: "clock")
-            }.help("Now Mode: Automatically scrolls to the top of the view to display newly incoming network requests.")
             Button(action: { isSharingStore = true }) {
                 Image(systemName: "square.and.arrow.up")
             }
