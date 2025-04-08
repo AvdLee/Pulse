@@ -15,18 +15,19 @@ struct ConsoleSearchResultView: View {
     var limit: Int = 4
     var isSeparatorNeeded = false
 
+    @Binding var selection: ConsoleSelectedItem?
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
-        ConsoleEntityCell(entity: viewModel.entity)
+        ConsoleEntityCell(entity: viewModel.entity, selection: $selection)
 #if os(macOS)
-            .tag(ConsoleSelectedItem.entity(viewModel.entity.objectID))
+            .consoleListItemSelectable(ConsoleSelectedItem.entity(viewModel.entity.objectID), selection: $selection)
 #endif
         let occurrences = Array(viewModel.occurrences).filter { $0.scope.isDisplayedInResults }
         ForEach(occurrences.prefix(limit)) { item in
 #if os(macOS)
             makeCell(for: item)
-                .tag(ConsoleSelectedItem.occurrence(viewModel.entity.objectID, item))
+                .consoleListItemSelectable(ConsoleSelectedItem.occurrence(viewModel.entity.objectID, item), selection: $selection)
 #else
             NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity).injecting(environment)) {
                 makeCell(for: item)
@@ -149,7 +150,7 @@ struct ConsoleSearchResultDetailsView: View {
 
     var body: some View {
         List {
-            ConsoleSearchResultView(viewModel: viewModel, limit: Int.max)
+            ConsoleSearchResultView(viewModel: viewModel, limit: Int.max, selection: .constant(nil))
         }
         .listStyle(.plain)
         .environment(\.defaultMinListRowHeight, 0)

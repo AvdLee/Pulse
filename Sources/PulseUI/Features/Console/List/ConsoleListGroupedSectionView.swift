@@ -14,7 +14,8 @@ struct ConsoleListGroupedSectionView: View {
     let section: NSFetchedResultsSectionInfo
     @ObservedObject var viewModel: ConsoleListViewModel
     @EnvironmentObject private var environment: ConsoleEnvironment
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
         let objects = (section.objects as? [NSManagedObject]) ?? []
         let prefix = objects.prefix(3)
@@ -22,7 +23,9 @@ struct ConsoleListGroupedSectionView: View {
 
         PlainListExpandableSectionHeader(title: title, count: section.numberOfObjects, destination: { EmptyView() }, isSeeAllHidden: true)
 
-        ForEach(prefix, id: \.objectID, content: ConsoleEntityCell.init)
+        ForEach(prefix, id: \.objectID, content: { object in
+            ConsoleEntityCell(entity: object, selection: $selection)
+        })
 
         if prefix.count < objects.count {
 #if os(iOS) || os(visionOS)

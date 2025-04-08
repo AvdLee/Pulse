@@ -12,7 +12,8 @@ import Combine
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleSearchListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
 #if os(iOS) || os(visionOS)
         ConsoleSearchToolbar()
@@ -23,7 +24,7 @@ struct ConsoleSearchListContentView: View {
             showNewResultsPromptView
         }
 #endif
-        ConsoleSearchResultsListContentView()
+        ConsoleSearchResultsListContentView(selection: $selection)
     }
 
     @ViewBuilder private var showNewResultsPromptView: some View {
@@ -50,7 +51,8 @@ struct ConsoleSearchListContentView: View {
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleSearchResultsListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
 #if os(iOS) || os(visionOS)
         if !viewModel.results.isEmpty {
@@ -59,7 +61,7 @@ struct ConsoleSearchResultsListContentView: View {
 #endif
         ForEach(viewModel.results) { result in
             let isLast = result.id == viewModel.results.last?.id
-            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
+            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast, selection: $selection)
                 .onAppear {
                     viewModel.didScroll(to: result)
                 }

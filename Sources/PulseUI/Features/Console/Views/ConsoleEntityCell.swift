@@ -10,16 +10,17 @@ import CoreData
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
         switch LoggerEntity(entity) {
         case .message(let message):
-            _ConsoleMessageCell(message: message)
+            _ConsoleMessageCell(message: message, selection: $selection)
 #if os(macOS)
                 .listRowSeparator(.visible)
 #endif
         case .task(let task):
-            _ConsoleTaskCell(task: task)
+            _ConsoleTaskCell(task: task, selection: $selection)
 #if os(macOS)
                 .listRowSeparator(.visible)
 #endif
@@ -32,14 +33,15 @@ private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
     @State private var shareItems: ShareItems?
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
 #if os(iOS) || os(visionOS)
         let cell = ConsoleMessageCell(message: message, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: ConsoleMessageDetailsView(message: message)).opacity(0))
 #elseif os(macOS)
         let cell = ConsoleMessageCell(message: message)
-            .tag(ConsoleSelectedItem.entity(message.objectID))
+            .consoleListItemSelectable(ConsoleSelectedItem.entity(message.objectID), selection: $selection)
 #else
         // `id` is a workaround for macOS (needs to be fixed)
         let cell = NavigationLink(destination: ConsoleMessageDetailsView(message: message)) {
@@ -77,14 +79,15 @@ private struct _ConsoleTaskCell: View {
     @State private var sharedTask: NetworkTaskEntity?
     @Environment(\.store) private var store
     @EnvironmentObject private var environment: ConsoleEnvironment
-
+    @Binding var selection: ConsoleSelectedItem?
+    
     var body: some View {
 #if os(iOS) || os(visionOS)
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: inspector).opacity(0))
 #elseif os(macOS)
         let cell = ConsoleTaskCell(task: task)
-            .tag(ConsoleSelectedItem.entity(task.objectID))
+            .consoleListItemSelectable(ConsoleSelectedItem.entity(task.objectID), selection: $selection)
 #else
         let cell = NavigationLink(destination: inspector) {
             ConsoleTaskCell(task: task)
@@ -127,5 +130,40 @@ private struct _ConsoleTaskCell: View {
         // We don't own NavigationView, so we have to inject the dependencies
         NetworkInspectorView(task: task)
             .injecting(environment)
+    }
+}
+
+struct ConsoleListItemSelectableViewModifier: ViewModifier {
+    @Binding var selection: ConsoleSelectedItem?
+    let selectedItem: ConsoleSelectedItem
+    @State private var isAppActive: Bool = NSApp.isActive
+    
+    func body(content: Content) -> some View {
+        content
+            .contentShape(Rectangle())
+            .padding(EdgeInsets(top: 3, leading: 6, bottom: 3, trailing: 6))
+            .background {
+                if selection == selectedItem {
+                    Color(nsColor: NSApp.isActive ? .selectedContentBackgroundColor : .unemphasizedSelectedContentBackgroundColor)
+                }
+            }
+            .cornerRadius(4)
+            .onTapGesture {
+                selection = selectedItem
+            }
+            .tag(selectedItem)
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                isAppActive = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
+                isAppActive = false
+            }
+            .padding(.horizontal, 10)
+    }
+}
+
+extension View {
+    func consoleListItemSelectable(_ selectedItem: ConsoleSelectedItem, selection: Binding<ConsoleSelectedItem?>) -> some View {
+        self.modifier(ConsoleListItemSelectableViewModifier(selection: selection, selectedItem: selectedItem))
     }
 }

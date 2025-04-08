@@ -139,11 +139,12 @@ private struct _ConsoleListView: View {
     @EnvironmentObject private var router: ConsoleRouter
 
     @Environment(\.isSearching) private var isSearching
-
+    @Namespace var bottomID
+    
     var body: some View {
         content
-            .onChange(of: isSearching) {
-                searchViewModel.isSearchActive = $0
+            .onChange(of: isSearching) { _, isSearchActive in
+                searchViewModel.isSearchActive = isSearchActive
             }
     }
 
@@ -156,17 +157,37 @@ private struct _ConsoleListView: View {
                 ConsoleToolbarView()
             }
             Divider()
+            
             ScrollViewReader { proxy in
-                List(selection: $router.selection) {
-                    if isSearching && !searchViewModel.parameters.isEmpty {
-                        ConsoleSearchResultsListContentView()
-                    } else {
-                        ConsoleListContentView(proxy: proxy)
-                    }
-                }.scrollContentBackground(.hidden)
+                ZStack {
+                    ScrollView {
+                        LazyVStack(spacing: 4) {
+                            if isSearching && !searchViewModel.parameters.isEmpty {
+                                ConsoleSearchResultsListContentView(selection: $router.selection)
+                            } else {
+                                ConsoleListContentView(proxy: proxy, bottomID: bottomID, selection: $router.selection)
+                            }
+                        }.padding(.top)
+                    }.scrollContentBackground(.hidden)
+                        .defaultScrollAnchorToBottom()
+
+                    ScrollToBottomButton(proxy: proxy, bottomID: bottomID)
+                }
             }
-            .environment(\.defaultMinListRowHeight, 1)
         }
     }
 }
 #endif
+
+extension View {
+    func defaultScrollAnchorToBottom() -> some View {
+        if #available(macOS 15.0, *) {
+            return self.defaultScrollAnchor(.bottom)
+                .defaultScrollAnchor(.top, for: .alignment)
+        } else {
+            return self.defaultScrollAnchor(.bottom)
+        }
+    }
+}
+
+
