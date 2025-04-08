@@ -35,8 +35,8 @@ public extension RemoteLogger {
             self.connection = connection
             self.delegate = delegate
 
-            let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
-            self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
+            let isLogEnabled = ProcessInfo.processInfo.arguments.contains("-com.swiftlee.rocketsim.debug")
+            self.log = isLogEnabled ? OSLog(subsystem: "com.swiftlee.rocketsim", category: "RocketSim.RemoteLogger") : .disabled
         }
         
         public func start(on queue: DispatchQueue) {

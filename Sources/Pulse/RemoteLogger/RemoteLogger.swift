@@ -16,41 +16,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     /// The store that the logger was initialized with.
     public private(set) var store: LoggerStore?
 
-    @Published
-    public private(set) var browserState: NWBrowser.State = .setup {
-        didSet { os_log("Set browser state %{public}@", log: log, "\(oldValue) → \(browserState)") }
-    }
-
-    @Published
-    public private(set) var browserError: NWError?
-
-    @Published
-    public private(set) var servers: Set<NWBrowser.Result> = [] {
-        didSet { os_log("Set servers: %{private}@", log: log, "\(servers.map { $0.name ?? "" })") }
-    }
-
     public private(set) var isEnabled = false
-    private var preferredServer = ""
-
-    /// The servers that you previously connected to. The logger will prioritize
-    /// connecting to the ``RemoteLogger/selectedServerName``, but if it's not found
-    /// it'll pick the first server from the ``RemoteLogger/knownServers``.
-    @Published
-    public private(set) var knownServers: [String] = []
-
-    @Published
-    public private(set) var selectedServerName: String?
-
+    
     @Published
     public private(set) var connectionState: ConnectionState = .disconnected {
         didSet { os_log("Set public connection state %{public}@", log: log, "\(oldValue) → \(connectionState)") }
 
     }
-
-    // Browsing
-    private var browser: NWBrowser?
-    private var selectedServerPasscode: String?
-    private var serverVersion: Version?
 
     // Connections
     private var connectionCompletion: ((Result<Void, ConnectionError>) -> Void)?
@@ -60,7 +32,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
     private var pingItem: DispatchWorkItem?
-
+    private var port: NWEndpoint.Port?
+    private var parameters: NWParameters?
+    
     // Logging
     private var isLoggingPaused = true
     private var buffer: [LoggerStore.Event]? = []
@@ -69,25 +43,20 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     // Private
     private var isInitialized = false
-    private let keychain = Keychain(service: "com.github.kean.pulse")
     private let log: OSLog
 
     public enum ConnectionState {
         case disconnected, connecting, connected
     }
     
-    public var isOpenOnMacSupported: Bool {
-        guard let serverVersion = serverVersion else { return false }
-        return serverVersion >= Version(4, 0, 0)
-    }
-
     public enum ConnectionError: Error, LocalizedError {
         case network(NWError)
+        case waiting(NWError)
         case unknown(isProtected: Bool)
 
         public var errorDescription: String? {
             switch self {
-            case .network(let error):
+            case .network(let error), .waiting(let error):
                 return error.localizedDescription
             case .unknown(let isProtected):
                 return "Connection failed. Please\(isProtected ? " verify the password and" : "") try again."
@@ -112,10 +81,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
         isInitialized = true
 
-        if isEnabled {
-            startBrowser()
-        }
-
         cancellable = store.events.receive(on: DispatchQueue.main).sink { [weak self] in
             self?.didReceive(event: $0)
         }
@@ -134,38 +99,23 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private init() {
-//        let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
-//        self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         /// RocketSim Custom Logging:
         let isLogEnabled = ProcessInfo.processInfo.arguments.contains("-com.swiftlee.rocketsim.debug")
         self.log = isLogEnabled ? OSLog(subsystem: "com.swiftlee.rocketsim", category: "RocketSim.RemoteLogger") : .disabled
-        
-        self.knownServers = getKnownServers()
-
-        os_log("Did init with known servers: %{private}@", log: log, knownServers.debugDescription)
-
-        // Migrate to version 4
-        if !preferredServer.isEmpty, knownServers.isEmpty {
-            os_log("Did migrate preferred server: %{private}@", log: log, preferredServer)
-            self.knownServers = [preferredServer]
-            self.saveKnownServers()
-            self.preferredServer = ""
-        }
-        
-        /// Custom RocketSim code to ensure known servers is always set to RocketSim.
-        self.knownServers = ["RocketSim"]
     }
 
     /// Enables remote logging. The logger will start searching for available
     /// servers.
-    public func enable() {
+    public func enable(port: NWEndpoint.Port, parameters: NWParameters) {
         guard !isEnabled else { return }
         isEnabled = true
 
         os_log("Will enable", log: log)
         defer { os_log("Did enable", log: log) }
 
-        startBrowser()
+        self.port = port
+        self.parameters = parameters
+        openRocketSimConnection()
     }
 
     /// Disables remote logging and disconnects from the server.
@@ -187,143 +137,25 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         os_log("Will cancel", log: log)
         defer { os_log("Did cancel", log: log) }
 
-        stopBrowser()
         disconnect()
-    }
-
-    // MARK: Browsing
-
-    private func startBrowser() {
-        os_log("Will start browser", log: log)
-        defer { os_log("Did start browser", log: log) }
-
-        let parameters = NWParameters()
-        parameters.includePeerToPeer = true
-
-        let browser = NWBrowser(for: .bonjourWithTXTRecord(type: RemoteLogger.serviceType, domain: nil), using: parameters)
-        let box = SendableBox(value: self)
-        browser.stateUpdateHandler = {
-            box.value?.browserDidUpdateState($0)
-        }
-        browser.browseResultsChangedHandler = { results, _ in
-            box.value?.browserDidUpdateResults(results)
-        }
-        browser.start(queue: .main)
-
-        self.browser = browser
-    }
-
-    private func browserDidUpdateState(_ newState: NWBrowser.State) {
-        os_log("Browser did update state to %{public}@", log: log, "\(newState)")
-
-        browserState = newState
-        browserError = nil
-
-        switch newState {
-        case .waiting(let error):
-            os_log("Browser waiting with error: %{public}@", log: log, type: .error, error.debugDescription)
-            browserError = error
-        case .failed(let error):
-            os_log("Browser failed with error: %{public}@", log: log, type: .error, error.debugDescription)
-            NSLog("RocketSim Connect failed (1) with error: \(error.localizedDescription). Make sure to enable RocketSim: System → Privacy → Local Network → Turn RocketSim on. If the issue remains, please contact support@rocketsim.app.")
-            browserError = error
-            scheduleBrowserRetry()
-        case .ready:
-            servers = browser?.browseResults ?? []
-        case .cancelled:
-            servers = []
-        default:
-            break
-        }
-    }
-
-    private func browserDidUpdateResults(_ results: Set<NWBrowser.Result>) {
-        servers = results
-        connectAutomaticallyIfNeeded()
-        if connectionRetryItem != nil, results.contains(where: { $0.name == selectedServerName }) {
-            os_log("Did rediscover server: %{private}@", log: log, selectedServerName ?? "")
-            retryConnection()
-        }
-    }
-
-    private func scheduleBrowserRetry() {
-        os_log("Did scheduled browser retry", log: log)
-
-        // Automatically retry until the user cancels
-        let box = SendableBox(value: self)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
-            guard let self = box.value, self.isEnabled else { return }
-            self.stopBrowser()
-            self.startBrowser()
-        }
-    }
-
-    private func connectAutomaticallyIfNeeded() {
-        guard selectedServerName == nil else { return }
-
-        var servers: [String: NWBrowser.Result] = [:]
-        for server in self.servers {
-            guard let serverName = server.name else { continue }
-            servers[serverName] = server
-        }
-        
-        let rocketSimServers = servers.filter { $0.key.lowercased().contains("rocketsim") }
-        guard let preferredServer = rocketSimServers.preferredRocketSimServer() else {
-            os_log("Failed to find a preferred server out of RocketSim Servers: ${public}@", log: log, rocketSimServers)
-            return
-        }
-        
-        os_log("Will autoconnect to RocketSim server: %{private}@", log: log, preferredServer.0)
-        connect(to: preferredServer.1, passcode: getPasscode(forServerNamed: "RocketSim"))
-    }
-
-    private func stopBrowser() {
-        os_log("Will stop browser", log: log)
-        defer { os_log("Did stop browser", log: log) }
-
-        browser?.stateUpdateHandler = nil
-        browser?.browseResultsChangedHandler = nil
-        browser?.cancel()
-        browser = nil
-        browserError = nil
-        browserState = .cancelled
-        servers = []
     }
 
     // MARK: Connection
-
-    /// Returns `true` if the server is selected.
-    public func isSelected(_ server: NWBrowser.Result) -> Bool {
-        server.name == selectedServerName
-    }
-
-    /// Connects to the selected server.
-    ///
-    /// If the connection is successful, the server is saved to the list of
-    /// "known" servers and the passcode is stored in the keychain.
-    public func connect(to server: NWBrowser.Result, passcode: String? = nil, _ completion: ((Result<Void, ConnectionError>) -> Void)? = nil) {
-        guard let name = server.name else {
-            return os_log("Server name is missing", log: log, type: .error)
+    private func openRocketSimConnection() {
+        guard let port, let parameters else {
+            os_log("Cancel RocketSim connection since port and parameters are missing", log: log)
+            return
         }
+        let newConnection = NWConnection(
+            host: .name("localhost", nil),
+            port: port,
+            using: parameters
+        )
+        let connection = Connection(newConnection, delegate: self)
+        self.connectionState = .connecting
+        self.connection = connection
 
-        guard selectedServerName != name else { return }
-
-        disconnect()
-
-        if let completion {
-            os_log("Starting connection timeout", log: log)
-            connectionCompletion = completion
-
-            // There seems to be no good way to catch the incorrect TLS
-            // encryption key error, so the connection has a 5 second timeout.
-            let work = DispatchWorkItem { [weak self] in
-                self?.connectionDidTimeout(isProtected: passcode != nil)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: work)
-            connectionTimeoutItem = work
-        }
-
-        openConnection(to: server, passcode: passcode)
+        connection.start(on: DispatchQueue.main)
     }
     
     private func connectionDidTimeout(isProtected: Bool) {
@@ -332,46 +164,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connectionCompletion = nil
         disconnect()
     }
-
-    /// Forget the server with the given name, disconnecting it, removing the
-    /// passcode, and removing it from the list of known servers.
-    public func forgetServer(named name: String) {
-        os_log("Forget server  %{private}@", log: log, name)
-        knownServers.removeAll(where: { $0 == name })
-        saveKnownServers()
-        setPasscode(nil, forServerNamed: name)
-        disconnect()
-    }
-
-    private func saveServer(named name: String) {
-        os_log("Save server %{private}@", log: log, name)
-        knownServers.removeAll(where: { $0 == name })
-        knownServers.append(name)
-        saveKnownServers()
-    }
-
-    private func openConnection(to server: NWBrowser.Result, passcode: String?) {
-        os_log("Will open connection to %{private}@ with endpoint %{private}@", log: log, server.name ?? "–", "\(server.endpoint)")
-
-        selectedServerName = server.name
-        selectedServerPasscode = passcode
-
-        let connection: Connection
-        if server.isProtected, let passcode {
-            os_log("Create .tls connection", log: log)
-            connection = Connection(endpoint: server.endpoint, using: .init(passcode: passcode))
-        } else {
-            os_log("Create .tcp connection", log: log)
-            connection = Connection(endpoint: server.endpoint, using: .tcp)
-        }
-        connection.delegate = self
-
-        self.connectionState = .connecting
-        self.connection = connection
-
-        connection.start(on: DispatchQueue.main)
-    }
-
+    
     // MARK: RemoteLoggerConnectionDelegate
 
     public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
@@ -381,8 +174,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         case .ready:
             handshakeWithServer()
         case .waiting(let error):
-            os_log("Connection failed with error: %{public}@", log: log, type: .error, error.debugDescription)
-            connectionError = nil
+            os_log("Connection failed while waiting with error: %{public}@", log: log, type: .error, error.debugDescription)
+            connectionError = .waiting(error)
+            connectionState = .disconnected
+            scheduleConnectionRetry()
         case .failed(let error):
             os_log("Connection failed with error: %{public}@", log: log, type: .error, error.debugDescription)
             NSLog("RocketSim Connect failed (2) with error: \(error.localizedDescription). Make sure to enable RocketSim: System → Privacy → Local Network → Turn RocketSim on. If the issue remains, please contact support@rocketsim.app.")
@@ -407,22 +202,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             scheduleConnectionRetry()
         case .completed:
             break
-        }
-    }
-
-    // MARK:
-
-    /// Returns passcode for the sever with the given name.
-    public func getPasscode(forServerNamed name: String) -> String? {
-        keychain.string(forKey: name)
-    }
-
-    /// Sets or removed passcode for the server with the given name.
-    public func setPasscode(_ passcode: String?, forServerNamed name: String) {
-        if let passcode {
-            try? keychain.set(passcode, forKey: name)
-        } else {
-            try? keychain.deleteItem(forKey: name)
         }
     }
 
@@ -505,19 +284,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connectionTimeoutItem?.cancel()
         connectionTimeoutItem = nil
 
-        if let server = selectedServerName {
-            saveServer(named: server)
-            if let passcode = selectedServerPasscode {
-                setPasscode(passcode, forServerNamed: server)
-            }
-        }
-
-        if let response {
-            serverVersion = try? Version(string: response.version) // Throw should never happen
-        } else {
-            serverVersion = nil
-        }
-
         schedulePing()
     }
 
@@ -541,14 +307,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connectionRetryItem?.cancel()
         connectionRetryItem = nil
 
-        if let server = selectedServerName,
-           let server = servers.first(where: { $0.name == server }) {
-            openConnection(to: server, passcode: selectedServerName.flatMap(getPasscode))
-        } else {
-            os_log("Selected serve no longer discoverable", log: log)
-            connectionState = .disconnected
-            scheduleConnectionRetry()
-        }
+        connectionState = .disconnected
+        
+        openRocketSimConnection()
     }
 
     private func scheduleAutomaticDisconnect() {
@@ -593,12 +354,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         os_log("Disconnect from the current server", log: log)
 
-        selectedServerName = nil
-        selectedServerPasscode = nil
-        serverVersion = nil
-
         connection?.cancel()
-        connection = nil
 
         connectionRetryItem?.cancel()
         connectionRetryItem = nil
@@ -669,24 +425,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public func showDetails(for task: NetworkTaskEntity) {
         connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
     }
-
-
-    // MARK: Persistence
-
-    private func getKnownServers() -> [String] {
-        ["RocketSim"]
-    }
-
-    private func saveKnownServers() {
-        // No longer needed since we always return RocketSim.
-    }
-
 }
 
 // MARK: - Helpers
 
 private func getFallbackDeviceId() -> UUID {
-    let key = "com-github-com-kean-pulse-device-id"
+    let key = "com-swiftlee-rocketsim-connect-device-id"
     if let value = UserDefaults.standard.string(forKey: key), let uuid = UUID(uuidString: value) {
         return uuid
     }
@@ -729,10 +473,6 @@ extension RemoteLogger.ConnectionState {
         case .connected: return "connected"
         }
     }
-}
-
-extension RemoteLogger {
-    public static var serviceType = "_pulse._tcp"
 }
 
 extension [String: NWBrowser.Result] {

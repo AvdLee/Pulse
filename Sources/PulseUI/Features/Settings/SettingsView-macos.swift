@@ -16,14 +16,6 @@ struct SettingsView: View {
 
     var body: some View {
         List {
-            if environment.configuration.allowRemoteLogging {
-                if store === RemoteLogger.shared.store {
-                    RemoteLoggerSettingsView(viewModel: .shared)
-                } else {
-                    Text("Not available")
-                        .foregroundColor(.secondary)
-                }
-            }
             Section(header: Text("Store")) {
                 if #available(macOS 13, *), let info = try? store.info() {
                     LoggerStoreSizeChart(info: info, sizeLimit: store.configuration.sizeLimit)
