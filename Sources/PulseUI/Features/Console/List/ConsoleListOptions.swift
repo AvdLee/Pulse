@@ -6,9 +6,9 @@ import Foundation
 import Pulse
 
 public struct ConsoleListOptions: Equatable {
-    var messageSortBy: MessageSortBy = .dateCreated
-    var taskSortBy: TaskSortBy = .dateCreated
-    var order: Ordering = .descending
+    var messageSortBy: MessageSortBy
+    var taskSortBy: TaskSortBy
+    var order: Ordering
     var messageGroupBy: MessageGroupBy = .noGrouping
     var taskGroupBy: TaskGroupBy = .noGrouping
 

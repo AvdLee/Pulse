@@ -156,14 +156,15 @@ private struct _ConsoleListView: View {
                 ConsoleToolbarView()
             }
             Divider()
-            List(selection: $router.selection) {
-                if isSearching && !searchViewModel.parameters.isEmpty {
-                    ConsoleSearchResultsListContentView()
-                } else {
-                    ConsoleListContentView()
-                }
-            }.scrollContentBackground(.hidden)
-            .scrollContentBackground(.hidden)
+            ScrollViewReader { proxy in
+                List(selection: $router.selection) {
+                    if isSearching && !searchViewModel.parameters.isEmpty {
+                        ConsoleSearchResultsListContentView()
+                    } else {
+                        ConsoleListContentView(proxy: proxy)
+                    }
+                }.scrollContentBackground(.hidden)
+            }
             .environment(\.defaultMinListRowHeight, 1)
         }
     }
