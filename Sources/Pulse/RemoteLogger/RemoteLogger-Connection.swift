@@ -125,9 +125,7 @@ public extension RemoteLogger {
                let handler = handlers.removeValue(forKey: header.id) {
                 handler(try? Message.decode(packet.body).data, nil)
             } else {
-                DispatchQueue.main.async {
-                    self.delegate?.connection(self, didReceiveEvent: event)
-                }
+                self.delegate?.connection(self, didReceiveEvent: event)
             }
         }
         
