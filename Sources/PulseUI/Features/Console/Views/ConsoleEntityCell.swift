@@ -140,8 +140,8 @@ struct ConsoleListItemSelectableViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .contentShape(Rectangle())
             .padding(EdgeInsets(top: 3, leading: 6, bottom: 3, trailing: 6))
+            .contentShape(Rectangle())
             .background {
                 if selection == selectedItem {
                     Color(nsColor: NSApp.isActive ? .selectedContentBackgroundColor : .unemphasizedSelectedContentBackgroundColor)
