@@ -34,6 +34,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var pingItem: DispatchWorkItem?
     private var port: NWEndpoint.Port?
     private var parameters: NWParameters?
+    private var retryCount = 0
+    
+    /// The number of times RocketSim Connect tries to reconnect to RocketSim.
+    private var retryLimit = 3
     
     // Logging
     private var isLoggingPaused = true
@@ -294,6 +298,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         guard connectionState != .connected else { return }
         connectionState = .connected
+        retryCount = 0
 
         NSLog("Connected to RocketSim 🚀")
         connectionCompletion?(.success(()))
@@ -308,7 +313,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     private func scheduleConnectionRetry() {
         guard connectionRetryItem == nil else { return }
-
+        guard retryCount < retryLimit else {
+            NSLog("Failed to connect with RocketSim after \(retryLimit) attempts. Giving up... Make sure RocketSim is running and relaunch your app.")
+            disconnect()
+            return
+        }
+        retryCount += 1
         os_log("Schedule connection retry", log: log)
 
         cancelPingPong()
@@ -316,7 +326,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         let item = DispatchWorkItem { [weak self] in
             self?.retryConnection()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: item)
+        /// Slowly increase the retry delay to give the opportunity to launch RocketSim.
+        let delayInSeconds = retryCount * 10
+        NSLog("RocketSim Connect failed to establish connection. Retrying in \(delayInSeconds) seconds... (\(retryCount)/3)")
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(delayInSeconds), execute: item)
         connectionRetryItem = item
     }
 
