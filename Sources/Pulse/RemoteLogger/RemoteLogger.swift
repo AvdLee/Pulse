@@ -172,6 +172,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         switch newState {
         case .ready:
+            NSLog("RocketSim application detected, connecting...")
             handshakeWithServer()
         case .waiting(let error):
             os_log("Connection failed while waiting with error: %{public}@", log: log, type: .error, error.debugDescription)
@@ -180,7 +181,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             scheduleConnectionRetry()
         case .failed(let error):
             os_log("Connection failed with error: %{public}@", log: log, type: .error, error.debugDescription)
-            NSLog("RocketSim Connect failed (2) with error: \(error.localizedDescription). Make sure to enable RocketSim: System → Privacy → Local Network → Turn RocketSim on. If the issue remains, please contact support@rocketsim.app.")
+            
+            logTroubleshootingMessage(for: error)
             connectionError = .network(error)
             connectionState = .disconnected
             scheduleConnectionRetry()
@@ -189,6 +191,22 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
+    private func logTroubleshootingMessage(for error: Error) {
+        if let nwError = error as? NWError, case .posix(let posixError) = nwError, posixError == .ECONNRESET {
+            /// RocketSim probably closed, this is expected.
+            NSLog("RocketSim application closed the connection.")
+        } else {
+            NSLog("""
+            RocketSim Connect failed (2) with error: \(error.localizedDescription).
+            
+            To troubleshoot if this is unexpected:
+            - Make sure to enable Local Network for RocketSim: System → Privacy → Local Network → Turn RocketSim on.
+            - Enable debug logs by adding -com.swiftlee.rocketsim.debug 1 to your launch arguments.
+            - If the issue remains, please contact support@rocketsim.app and share your console logs.
+            """)
+        }
+    }
+    
     public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         switch event {
         case .packet(let packet):
@@ -277,6 +295,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard connectionState != .connected else { return }
         connectionState = .connected
 
+        NSLog("Connected to RocketSim 🚀")
         connectionCompletion?(.success(()))
         connectionCompletion = nil
 
