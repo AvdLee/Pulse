@@ -3,6 +3,7 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
+import CoreImage
 
 #if !os(macOS)
 import UIKit.UIImage
@@ -45,6 +46,13 @@ enum Graphics {
 #else
         let type: String = "public.heic"
 #endif
+        
+        #if !os(macOS)
+        guard !source.hasAlpha else {
+            /// Fixes warnings like: writeImageAtIndex:1035: ⭕️ ERROR: 'AVCam' is trying to save an opaque image (120x120) with 'AlphaLast'. This would unnecessarily increase the file size and will double (!!!) the required memory when decoding the image --> ignoring alpha.
+            return image.jpegData(compressionQuality: 0.33)
+        }
+        #endif
         guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, type as CFString, 1, nil) else {
             return nil
         }
@@ -65,6 +73,17 @@ enum Graphics {
             "ResponsePixelWidth": String(Int(image.size.width)),
             "ResponsePixelHeight": String(Int(image.size.height))
         ]
+    }
+}
+
+extension CGImage {
+    var hasAlpha: Bool {
+        switch alphaInfo {
+        case .first, .last, .premultipliedFirst, .premultipliedLast:
+            return true
+        default:
+            return false
+        }
     }
 }
 
