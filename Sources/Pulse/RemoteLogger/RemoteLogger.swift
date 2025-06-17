@@ -54,7 +54,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // Private
     private var isInitialized = false
     private let log: OSLog
-
+    private var lastReceivedCode: PacketCode?
+    
     public enum ConnectionState {
         case disconnected, connecting, connected
     }
@@ -270,7 +271,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         let code = RemoteLogger.PacketCode(rawValue: packet.code)
 
         if let code {
-            os_log("Did receive packet with code: %{public}@", log: log, type: .info, String(describing: code))
+            if code != lastReceivedCode {
+                lastReceivedCode = code
+                os_log("Did receive packet with code: %{public}@", log: log, type: .info, String(describing: code))
+            }
         } else {
             os_log("Did receive packet with unsupported code: %{public}@", log: log, type: .info, String(describing: packet.code))
         }
@@ -297,8 +301,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             case .getMockedResponse, .openMessageDetails, .openTaskDetails:
                 break // Server specific (should never happen)
             }
-        case .videoFrame:
-            store?.handle(.videoFrame(packet.body))
         default:
             break // Do nothing
         }
@@ -441,8 +443,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             } catch {
                 os_log("Failed to encode network message %{public}@", log: log, type: .error, "\(error)")
             }
-        case .videoFrame(let data):
-            connection?.send(code: .videoFrame, data: data)
         }
     }
 
@@ -469,6 +469,11 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     
     public func showDetails(for task: NetworkTaskEntity) {
         connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
+    }
+    
+    // MARK: Custom Messages
+    public func send(code: PacketCode, data: Data = Data()) {
+        connection?.send(code: code.rawValue, data: data)
     }
 }
 

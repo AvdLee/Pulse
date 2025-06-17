@@ -32,6 +32,9 @@ public extension RemoteLogger {
         case message = 13
         
         case videoFrame = 14
+        
+        case startSimulatorCamera = 15
+        case stopSimulatorCamera = 16
     }
 
     struct PacketClientHello: Codable {
