@@ -28,7 +28,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
     
     private weak var delegate: RemoteLoggerDelegate?
-
+    private let rocketSimLoggerQueue = DispatchQueue(label: "com.swiftlee.rocketsim.logger", qos: .userInitiated, attributes: .concurrent)
+    
     // Connections
     private var connectionCompletion: ((Result<Void, ConnectionError>) -> Void)?
     private var connection: Connection?
@@ -165,7 +166,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         self.connectionState = .connecting
         self.connection = connection
 
-        connection.start(on: DispatchQueue.main)
+        connection.start(on: rocketSimLoggerQueue)
     }
     
     private func connectionDidTimeout(isProtected: Bool) {
