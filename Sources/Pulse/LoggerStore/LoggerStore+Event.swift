@@ -11,6 +11,7 @@ extension LoggerStore {
         case networkTaskCreated(NetworkTaskCreated)
         case networkTaskProgressUpdated(NetworkTaskProgressUpdated)
         case networkTaskCompleted(NetworkTaskCompleted)
+        case videoFrame(Data)
 
         public struct MessageCreated: Codable, Sendable {
             public var createdAt: Date
@@ -140,7 +141,7 @@ extension LoggerStore {
 
         var url: URL? {
             switch self {
-            case .messageStored:
+            case .messageStored, .videoFrame:
                 return nil
             case .networkTaskCreated(let event):
                 return event.originalRequest.url

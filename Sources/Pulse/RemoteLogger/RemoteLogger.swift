@@ -8,6 +8,10 @@ import Combine
 import SwiftUI
 import OSLog
 
+public protocol RemoteLoggerDelegate: AnyObject {
+    func didReceiveMessage(packet: RemoteLogger.Connection.Packet) throws
+}
+
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
 ///
@@ -21,8 +25,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     @Published
     public private(set) var connectionState: ConnectionState = .disconnected {
         didSet { os_log("Set public connection state %{public}@", log: log, "\(oldValue) → \(connectionState)") }
-
     }
+    
+    private weak var delegate: RemoteLoggerDelegate?
 
     // Connections
     private var connectionCompletion: ((Result<Void, ConnectionError>) -> Void)?
@@ -110,9 +115,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     /// Enables remote logging. The logger will start searching for available
     /// servers.
-    public func enable(port: NWEndpoint.Port, parameters: NWParameters) {
+    public func enable(port: NWEndpoint.Port, parameters: NWParameters, delegate: RemoteLoggerDelegate) {
         guard !isEnabled else { return }
         isEnabled = true
+        self.delegate = delegate
 
         os_log("Will enable", log: log)
         defer { os_log("Did enable", log: log) }
@@ -258,6 +264,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func didReceiveMessage(packet: Connection.Packet) throws {
+        try delegate?.didReceiveMessage(packet: packet)
+        
         let code = RemoteLogger.PacketCode(rawValue: packet.code)
 
         if let code {
@@ -288,6 +296,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             case .getMockedResponse, .openMessageDetails, .openTaskDetails:
                 break // Server specific (should never happen)
             }
+        case .videoFrame:
+            store?.handle(.videoFrame(packet.body))
         default:
             break // Do nothing
         }
@@ -430,6 +440,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             } catch {
                 os_log("Failed to encode network message %{public}@", log: log, type: .error, "\(error)")
             }
+        case .videoFrame(let data):
+            connection?.send(code: .videoFrame, data: data)
         }
     }
 

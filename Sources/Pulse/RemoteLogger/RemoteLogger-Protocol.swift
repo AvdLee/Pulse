@@ -30,6 +30,8 @@ public extension RemoteLogger {
         //
         // Moving forward, all non-control packets will be send using this format.
         case message = 13
+        
+        case videoFrame = 14
     }
 
     struct PacketClientHello: Codable {

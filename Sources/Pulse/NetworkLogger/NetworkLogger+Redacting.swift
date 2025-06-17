@@ -12,7 +12,7 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated:
+        case .messageStored, .networkTaskProgressUpdated, .videoFrame:
             return self
         case .networkTaskCreated(let event):
             var event = event
@@ -34,7 +34,7 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated:
+        case .messageStored, .networkTaskProgressUpdated, .videoFrame:
             return self
         case .networkTaskCreated(let event):
             var event = event
@@ -55,7 +55,7 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated:
+        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated, .videoFrame:
             return self
         case .networkTaskCompleted(let event):
             var event = event
