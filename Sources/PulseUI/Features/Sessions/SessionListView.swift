@@ -40,7 +40,7 @@ struct SessionListView: View {
             } else {
                 content
                     .onAppear { refreshGroups() }
-                    .onChange(of: sessions.count) { _ in refreshGroups() }
+                    .onChange(of: sessions.count) { refreshGroups() }
             }
         }
     }

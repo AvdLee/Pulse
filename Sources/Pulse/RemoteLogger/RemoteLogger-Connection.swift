@@ -24,7 +24,9 @@ public extension RemoteLogger {
         private var id: UInt32 = 0
         private var handlers: [UInt32: (Data?, Error?) -> Void] = [:]
         private let log: OSLog
-
+        public var state: NWConnection.State {
+            connection.state
+        }
         weak var delegate: RemoteLoggerConnectionDelegate?
 
         convenience init(endpoint: NWEndpoint, using parameters: NWParameters) {

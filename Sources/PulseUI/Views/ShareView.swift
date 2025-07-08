@@ -138,7 +138,9 @@ struct ShareNetworkTaskView: View {
                 ShareView(items)
             }
         }
-        .onChange(of: output, perform: render)
+        .onChange(of: output) { _, newValue in
+            render(with: newValue)
+        }
         .onAppear { render(with: output) }
         .frame(width: 240)
     }

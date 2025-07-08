@@ -9,7 +9,7 @@ import Pulse
 #endif
 
 public extension RemoteLogger {
-    enum PacketCode: UInt8, Equatable {
+    enum PacketCode: UInt8, Equatable, Sendable {
         // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1 // ServerHelloResponse
@@ -35,6 +35,8 @@ public extension RemoteLogger {
         
         case startSimulatorCamera = 15
         case stopSimulatorCamera = 16
+        
+        case metadataDetected = 17
     }
 
     struct PacketClientHello: Codable {

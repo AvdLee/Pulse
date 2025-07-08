@@ -26,8 +26,8 @@ struct NetworkInspectorView: View {
             Divider()
             selectedTabView
         }
-        .onChange(of: selectedTab) {
-            NetworkInspectorPreferences().selectedTab = $0
+        .onChange(of: selectedTab) { _, newValue in
+            NetworkInspectorPreferences().selectedTab = newValue
         }
     }
 

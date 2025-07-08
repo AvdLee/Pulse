@@ -443,6 +443,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             } catch {
                 os_log("Failed to encode network message %{public}@", log: log, type: .error, "\(error)")
             }
+        case .customMessage(let code, let data):
+            connection?.send(code: code.rawValue, data: data)
+            os_log("Did send custom message with code: %{public}@", log: log, type: .info, String(describing: code))
         }
     }
 
@@ -473,7 +476,16 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     
     // MARK: Custom Messages
     public func send(code: PacketCode, data: Data = Data()) {
-        connection?.send(code: code.rawValue, data: data)
+        didReceive(event: .customMessage(code: code, data: data))
+    }
+    
+    public func send<T: Codable>(code: PacketCode, entity: T) {
+        do {
+            let data = try JSONEncoder().encode(entity)
+            didReceive(event: .customMessage(code: code, data: data))
+        } catch {
+            os_log("Failed to encode custom message %{public}@", log: log, type: .error, "\(error)")
+        }
     }
 }
 

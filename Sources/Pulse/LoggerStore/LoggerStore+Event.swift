@@ -11,7 +11,8 @@ extension LoggerStore {
         case networkTaskCreated(NetworkTaskCreated)
         case networkTaskProgressUpdated(NetworkTaskProgressUpdated)
         case networkTaskCompleted(NetworkTaskCompleted)
-
+        case customMessage(code: RemoteLogger.PacketCode, data: Data)
+        
         public struct MessageCreated: Codable, Sendable {
             public var createdAt: Date
             public var label: String
@@ -148,6 +149,8 @@ extension LoggerStore {
                 return event.url
             case .networkTaskCompleted(let event):
                 return event.originalRequest.url
+            case .customMessage:
+                return nil
             }
         }
     }

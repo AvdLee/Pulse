@@ -73,9 +73,9 @@ struct SessionsView: View {
             }
 #else
             .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
-            .onChange(of: selection) {
-                guard filters.criteria.shared.sessions.selection != $0 else { return }
-                filters.select(sessions: $0)
+            .onChange(of: selection) { _, newValue in
+                guard filters.criteria.shared.sessions.selection != newValue else { return }
+                filters.select(sessions: newValue)
             }
 #endif
     }
