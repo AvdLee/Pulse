@@ -37,7 +37,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
         // THEN all logs loaded, including traces because there is no predicate by default
         XCTAssertEqual(entities.count, 15)
-        XCTAssertTrue(entities is [LoggerMessageEntity])
+        XCTAssertTrue(entities is [RSLoggerMessageEntity])
     }
 
     func testThatEntitiesAreOrderedByCreationDate() {
@@ -106,11 +106,11 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testSetCustomSortDescriptors() throws {
         // WHEN
-        sut.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.level, ascending: true)]
+        sut.sortDescriptors = [NSSortDescriptor(keyPath: \RSLoggerMessageEntity.level, ascending: true)]
         sut.refresh()
 
         // THEN
-        let messages = try XCTUnwrap(sut.entities as? [LoggerMessageEntity])
+        let messages = try XCTUnwrap(sut.entities as? [RSLoggerMessageEntity])
         XCTAssertEqual(messages, messages.sorted(by: { $0.level < $1.level }))
     }
 
@@ -144,7 +144,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
         // THEN entities are updated
         XCTAssertTrue(sut.entities.contains(where: {
-            ($0 as! LoggerMessageEntity).text == "test" })
+            ($0 as! RSLoggerMessageEntity).text == "test" })
         )
     }
 
@@ -169,12 +169,12 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
         // THEN entities are updated
         XCTAssertTrue(sut.entities.contains(where: {
-            ($0 as! LoggerMessageEntity).text == "test" })
+            ($0 as! RSLoggerMessageEntity).text == "test" })
         )
 
         // THEN sections are updated
         XCTAssertTrue((sut.sections ?? []).contains(where: {
-            ($0.objects as! [LoggerMessageEntity]).contains(where: {
+            ($0.objects as! [RSLoggerMessageEntity]).contains(where: {
                 $0.text == "test"
             })
         }))
@@ -195,7 +195,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         // THEN only errors are displayed
         XCTAssertEqual(sut.entities.count, 3)
         XCTAssertTrue(sut.entities.allSatisfy({
-            ($0 as! LoggerMessageEntity).logLevel >= .error
+            ($0 as! RSLoggerMessageEntity).logLevel >= .error
         }))
     }
 
@@ -216,7 +216,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         // THEN only errors are displayed
         XCTAssertEqual(sut.entities.count, 3)
         XCTAssertTrue(sut.entities.allSatisfy({
-            ($0 as! LoggerMessageEntity).logLevel >= .error
+            ($0 as! RSLoggerMessageEntity).logLevel >= .error
         }))
     }
 
@@ -233,8 +233,8 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 }
 
 private func isOrderedBefore(_ lhs: NSManagedObject, _ rhs: NSManagedObject) -> Bool {
-    let lhs = (lhs as? LoggerMessageEntity)?.createdAt ?? (lhs as? NetworkTaskEntity)!.createdAt
-    let rhs = (rhs as? LoggerMessageEntity)?.createdAt ?? (rhs as? NetworkTaskEntity)!.createdAt
+    let lhs = (lhs as? RSLoggerMessageEntity)?.createdAt ?? (lhs as? NetworkTaskEntity)!.createdAt
+    let rhs = (rhs as? RSLoggerMessageEntity)?.createdAt ?? (rhs as? NetworkTaskEntity)!.createdAt
 #if os(macOS)
     return lhs < rhs
 #else

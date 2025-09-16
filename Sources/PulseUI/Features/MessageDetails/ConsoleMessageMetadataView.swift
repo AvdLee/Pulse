@@ -7,7 +7,7 @@ import Pulse
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageMetadataView: View {
-    let message: LoggerMessageEntity
+    let message: RSLoggerMessageEntity
 
     var body: some View {
         RichTextView(viewModel: .init(string: string))

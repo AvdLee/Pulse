@@ -466,7 +466,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     
     // MARK: Details
     
-    public func showDetails(for message: LoggerMessageEntity) {
+    public func showDetails(for message: RSLoggerMessageEntity) {
         connection?.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
     }
     

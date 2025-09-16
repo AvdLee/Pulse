@@ -12,7 +12,7 @@ import CoreData
 enum ContextMenu {
     @available(iOS 15, visionOS 1.0, *)
     struct MessageContextMenu: View {
-        let message: LoggerMessageEntity
+        let message: RSLoggerMessageEntity
 
         @Binding private(set) var shareItems: ShareItems?
 

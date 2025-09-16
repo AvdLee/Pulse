@@ -16,7 +16,7 @@ protocol ConsoleSearchFilterProtocol {
 }
 
 protocol ConsoleSearchLogFilterProtocol: ConsoleSearchFilterProtocol {
-    func isMatch(_ task: LoggerMessageEntity) -> Bool
+    func isMatch(_ task: RSLoggerMessageEntity) -> Bool
 }
 
 protocol ConsoleSearchNetworkFilterProtocol: ConsoleSearchFilterProtocol {
@@ -63,7 +63,7 @@ struct ConsoleSearchFilterLevel: ConsoleSearchLogFilterProtocol, Hashable, Codab
     var values: [LoggerStore.Level]
     var valueExamples: [String] { ["debug"] }
 
-    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+    func isMatch(_ message: RSLoggerMessageEntity) -> Bool {
         values.contains { message.logLevel == $0 }
     }
 }
@@ -73,7 +73,7 @@ struct ConsoleSearchFilterLabel: ConsoleSearchLogFilterProtocol, Hashable, Codab
     var values: [String]
     var valueExamples: [String] { ["label"] }
 
-    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+    func isMatch(_ message: RSLoggerMessageEntity) -> Bool {
         values.contains { message.label == $0 }
     }
 }
@@ -83,7 +83,7 @@ struct ConsoleSearchFilterFile: ConsoleSearchLogFilterProtocol, Hashable, Codabl
     var values: [String]
     var valueExamples: [String] { ["filename"] }
 
-    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+    func isMatch(_ message: RSLoggerMessageEntity) -> Bool {
         values.contains { message.file == $0 }
     }
 }

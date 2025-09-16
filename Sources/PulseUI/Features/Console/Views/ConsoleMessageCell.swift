@@ -9,7 +9,7 @@ import Combine
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageCell: View {
-    let message: LoggerMessageEntity
+    let message: RSLoggerMessageEntity
     var isDisclosureNeeded = false
 
     @ObservedObject private var settings: UserSettings = .shared

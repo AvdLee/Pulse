@@ -7,9 +7,9 @@ import Pulse
 
 struct DebugAnalyticsView: View {
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \RSLoggerMessageEntity.createdAt, ascending: true)],
         predicate: makePredicate(searchText: "")
-    ) var messages: FetchedResults<LoggerMessageEntity>
+    ) var messages: FetchedResults<RSLoggerMessageEntity>
 
     @State private var searchText = ""
 
@@ -51,7 +51,7 @@ private func makePredicate(searchText: String) -> NSPredicate {
 }
 
 private struct DebugAnalyticsDetailsView: View {
-    let message: LoggerMessageEntity
+    let message: RSLoggerMessageEntity
 
     @State private var searchText = ""
 

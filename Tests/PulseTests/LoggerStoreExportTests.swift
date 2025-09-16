@@ -34,13 +34,13 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = store.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 10)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).count, 10)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
@@ -77,12 +77,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
@@ -121,12 +121,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
@@ -161,13 +161,13 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 3)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 3)
@@ -205,12 +205,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
@@ -249,12 +249,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
@@ -289,13 +289,13 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 3)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 3)
@@ -335,12 +335,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
@@ -381,12 +381,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
@@ -423,13 +423,13 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 3)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 3)
@@ -469,12 +469,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
@@ -515,12 +515,12 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
@@ -557,13 +557,13 @@ final class LoggerStoreExportTests: LoggerStoreBaseTests {
         let context = copy.viewContext
 
         XCTAssertEqual(
-            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set(try context.fetch(RSLoggerSessionEntity.self).map(\.id)),
             Set([ExportableStoreConstants.sessionTwo.id])
         )
 
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 4)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(RSLoggerMessageEntity.self).count, 4)
         XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 3)
         XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
         XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 3)

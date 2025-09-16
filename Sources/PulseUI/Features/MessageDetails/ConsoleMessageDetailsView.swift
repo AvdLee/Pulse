@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageDetailsView: View {
-    let message: LoggerMessageEntity
+    let message: RSLoggerMessageEntity
 
 #if os(iOS) || os(visionOS)
     var body: some View {
@@ -108,8 +108,8 @@ struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     }
 }
 
-func makeMockMessage() -> LoggerMessageEntity {
-    let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
+func makeMockMessage() -> RSLoggerMessageEntity {
+    let entity = RSLoggerMessageEntity(context: LoggerStore.mock.viewContext)
     entity.text = "test"
     entity.createdAt = Date()
     entity.label = "auth"

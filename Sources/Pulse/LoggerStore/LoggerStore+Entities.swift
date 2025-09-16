@@ -4,14 +4,14 @@
 
 import CoreData
 
-public final class LoggerSessionEntity: NSManagedObject {
+public final class RSLoggerSessionEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var id: UUID
     @NSManaged public var version: String?
     @NSManaged public var build: String?
 }
 
-public final class LoggerMessageEntity: NSManagedObject {
+public final class RSLoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
@@ -97,7 +97,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     /// The `taskDescription` value of `URLSessionTask`.
     @NSManaged public var taskDescription: String?
     /// Associated (technical) message.
-    @NSManaged public var message: LoggerMessageEntity?
+    @NSManaged public var message: RSLoggerMessageEntity?
 
     // MARK: Helpers
 

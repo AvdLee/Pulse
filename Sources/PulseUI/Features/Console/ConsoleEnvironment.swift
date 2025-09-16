@@ -67,9 +67,9 @@ final class ConsoleEnvironment: ObservableObject {
         self.filters = ConsoleFiltersViewModel(options: makeDefaultOptions())
 
         self.logCountObserver = ManagedObjectsCountObserver(
-            entity: LoggerMessageEntity.self,
+            entity: RSLoggerMessageEntity.self,
             context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)
+            sortDescriptior: NSSortDescriptor(keyPath: \RSLoggerMessageEntity.createdAt, ascending: false)
         )
 
         self.taskCountObserver = ManagedObjectsCountObserver(

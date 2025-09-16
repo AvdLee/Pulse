@@ -57,7 +57,7 @@ enum ShareService {
         }
     }
 
-    static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
+    static func share(_ message: RSLoggerMessageEntity, as output: ShareOutput) -> ShareItems {
         let string = TextRenderer(options: .sharing).make { $0.render(message) }
         return share(string, as: output)
     }

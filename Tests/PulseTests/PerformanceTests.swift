@@ -78,7 +78,7 @@ final class PerformanceTests: XCTestCase {
     }
 
     func xtestQueryByLevel() {
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
+        let request = NSFetchRequest<RSLoggerMessageEntity>(entityName: "RSLoggerMessageEntity")
         request.predicate = NSPredicate(format: "level == %i", LoggerStore.Level.info.rawValue)
 
         let moc = store.viewContext

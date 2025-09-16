@@ -57,12 +57,12 @@ final class TextRenderer {
         NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
-    func render(_ message: LoggerMessageEntity) {
+    func render(_ message: RSLoggerMessageEntity) {
         string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
         string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
     }
 
-    func renderCompact(_ message: LoggerMessageEntity) {
+    func renderCompact(_ message: RSLoggerMessageEntity) {
         var details = ConsoleFormatter.time(for: message.createdAt)
         if let label = ConsoleFormatter.label(for: message) {
             details += "\(ConsoleFormatter.separator)\(label)\(ConsoleFormatter.separator)"

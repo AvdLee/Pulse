@@ -115,7 +115,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 15)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
 
@@ -140,7 +140,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 15)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
 
@@ -161,7 +161,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 10)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
@@ -175,7 +175,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 10)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
@@ -319,7 +319,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(messages.count, 501)
         XCTAssertEqual(messages.last?.text, "500")
 
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 501)
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 501)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 1)
         context.reset()
@@ -334,12 +334,12 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         try await store.export(to: copyURL2)
 
         // THEN unwanted messages were removed
-        messages = try context.fetch(LoggerMessageEntity.self)
+        messages = try context.fetch(RSLoggerMessageEntity.self)
         XCTAssertEqual(messages.count, 351)
         XCTAssertEqual(messages.last?.text, "500") // Latest stored
 
         // THEN metadata, network requests, blobs are removed
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 351)
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 351)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
     }
@@ -369,7 +369,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // ASSERT
         let context = store.backgroundContext
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 4)
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 4)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         context.reset()
@@ -378,8 +378,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.syncSweep()
 
         // THEN session one is deleted
-        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).map(\.id), [sessionTwoID])
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
+        XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).map(\.id), [sessionTwoID])
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
@@ -411,7 +411,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerMessageEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerMessageEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
@@ -573,13 +573,13 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
     func testRemoveSessions() throws {
         // GIVEN
         populate(store: store)
-        let sessions = try store.viewContext.fetch(LoggerSessionEntity.self)
+        let sessions = try store.viewContext.fetch(RSLoggerSessionEntity.self)
 
         // WHEN
         store.removeSessions(withIDs: Set(sessions.map(\.id)))
 
         // THEN
-        XCTAssertEqual(try store.viewContext.fetch(LoggerSessionEntity.self).count, 0)
+        XCTAssertEqual(try store.viewContext.fetch(RSLoggerSessionEntity.self).count, 0)
         XCTAssertEqual(try store.allMessages().count, 0)
         XCTAssertEqual(try store.allTasks().count, 0)
     }
@@ -592,7 +592,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
 
         let context = store.viewContext
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 11)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 6)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 5)
@@ -603,7 +603,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.removeAll()
 
         // THEN both message and metadata are removed
-        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)
@@ -771,6 +771,6 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         }
         XCTAssertEqual(try info.viewContext.count(for: NetworkRequestEntity.self), 6000)
         XCTAssertEqual(try info.viewContext.count(for: NetworkResponseEntity.self), 5000)
-        XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 10000)
+        XCTAssertEqual(try info.viewContext.count(for: RSLoggerMessageEntity.self), 10000)
     }
 }

@@ -37,7 +37,7 @@ extension LoggerStore {
                 self.line = line
             }
             
-            init(_ entity: LoggerMessageEntity) {
+            init(_ entity: RSLoggerMessageEntity) {
                 self.createdAt = entity.createdAt
                 self.label = entity.label
                 self.level = LoggerStore.Level(rawValue: entity.level) ?? .debug

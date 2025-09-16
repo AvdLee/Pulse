@@ -51,7 +51,7 @@ extension DateFormatter {
 enum ConsoleFormatter {
     static let separator = " · "
 
-    static func subheadline(for message: LoggerMessageEntity, hasTime: Bool = true) -> String {
+    static func subheadline(for message: RSLoggerMessageEntity, hasTime: Bool = true) -> String {
         return [
             hasTime ? time(for: message.createdAt) : nil,
             message.logLevel.name.uppercased(),
@@ -59,7 +59,7 @@ enum ConsoleFormatter {
         ].compactMap { $0 }.joined(separator: separator)
     }
 
-    static func label(for message: LoggerMessageEntity) -> String? {
+    static func label(for message: RSLoggerMessageEntity) -> String? {
         let label = message.label
         guard label != "default", !label.isEmpty else {
             return nil

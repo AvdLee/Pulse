@@ -30,20 +30,20 @@ final class ManagedObjectsObserver<T: NSManagedObject>: NSObject, NSFetchedResul
     }
 }
 
-extension ManagedObjectsObserver where T == LoggerMessageEntity {
+extension ManagedObjectsObserver where T == RSLoggerMessageEntity {
     static func pins(for context: NSManagedObjectContext) -> ManagedObjectsObserver {
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
+        let request = NSFetchRequest<RSLoggerMessageEntity>(entityName: "\(RSLoggerMessageEntity.self)")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \RSLoggerMessageEntity.createdAt, ascending: false)]
         request.predicate = NSPredicate(format: "isPinned == YES")
 
         return ManagedObjectsObserver(request: request, context: context, cacheName: "com.github.pulse.pins-cache")
     }
 }
 
-extension ManagedObjectsObserver where T == LoggerSessionEntity {
+extension ManagedObjectsObserver where T == RSLoggerSessionEntity {
     static func sessions(for context: NSManagedObjectContext) -> ManagedObjectsObserver {
-        let request = NSFetchRequest<LoggerSessionEntity>(entityName: "\(LoggerSessionEntity.self)")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
+        let request = NSFetchRequest<RSLoggerSessionEntity>(entityName: "\(RSLoggerSessionEntity.self)")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \RSLoggerSessionEntity.createdAt, ascending: false)]
 
         return ManagedObjectsObserver(request: request, context: context, cacheName: "com.github.pulse.sessions-cache")
     }

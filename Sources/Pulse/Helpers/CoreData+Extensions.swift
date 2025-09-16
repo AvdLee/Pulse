@@ -91,8 +91,8 @@ extension NSPersistentStoreCoordinator {
 extension NSEntityDescription {
     convenience init<T>(class customClass: T.Type) where T: NSManagedObject {
         self.init()
-        self.name = String(describing: customClass) // e.g. `LoggerMessageEntity`
-        self.managedObjectClassName = T.self.description() // e.g. `Pulse.LoggerMessageEntity`
+        self.name = String(describing: customClass) // e.g. `RSLoggerMessageEntity`
+        self.managedObjectClassName = T.self.description() // e.g. `Pulse.RSLoggerMessageEntity`
     }
 }
 

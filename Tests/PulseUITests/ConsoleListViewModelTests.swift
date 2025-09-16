@@ -36,7 +36,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
         // THEN
         XCTAssertEqual(entities.count, 13)
-        XCTAssertTrue(entities is [LoggerMessageEntity])
+        XCTAssertTrue(entities is [RSLoggerMessageEntity])
     }
 
     func testThatEntitiesAreOrderedByCreationDate() {
@@ -135,7 +135,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         // THEN
         XCTAssertEqual(
             sut.entities,
-            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level < $1.level })
+            (sut.entities as! [RSLoggerMessageEntity]).sorted(by: { $0.level < $1.level })
         )
     }
 
@@ -148,7 +148,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         // THEN
         XCTAssertEqual(
             sut.entities,
-            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level > $1.level })
+            (sut.entities as! [RSLoggerMessageEntity]).sorted(by: { $0.level > $1.level })
         )
     }
 
@@ -234,8 +234,8 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 }
 
 private func isOrderedBefore(_ lhs: NSManagedObject, _ rhs: NSManagedObject) -> Bool {
-    let lhs = (lhs as? LoggerMessageEntity)?.createdAt ?? (lhs as? NetworkTaskEntity)!.createdAt
-    let rhs = (rhs as? LoggerMessageEntity)?.createdAt ?? (rhs as? NetworkTaskEntity)!.createdAt
+    let lhs = (lhs as? RSLoggerMessageEntity)?.createdAt ?? (lhs as? NetworkTaskEntity)!.createdAt
+    let rhs = (rhs as? RSLoggerMessageEntity)?.createdAt ?? (rhs as? NetworkTaskEntity)!.createdAt
 #if os(macOS)
     return lhs < rhs
 #else

@@ -14,8 +14,8 @@ struct ConsoleSessionsPickerView: View {
     @Environment(\.store) private var store: LoggerStore
 
 #if os(watchOS) || os(tvOS)
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
-    private var sessions: FetchedResults<LoggerSessionEntity>
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \RSLoggerSessionEntity.createdAt, ascending: false)])
+    private var sessions: FetchedResults<RSLoggerSessionEntity>
 #endif
 
     var body: some View {
@@ -65,8 +65,8 @@ struct ConsoleSessionsPickerView: View {
         }
     }
 
-    private func session(withID id: UUID) -> LoggerSessionEntity? {
-        let request = NSFetchRequest<LoggerSessionEntity>(entityName: String(describing: LoggerSessionEntity.self))
+    private func session(withID id: UUID) -> RSLoggerSessionEntity? {
+        let request = NSFetchRequest<RSLoggerSessionEntity>(entityName: String(describing: RSLoggerSessionEntity.self))
         request.predicate = NSPredicate(format: "id == %@", id as NSUUID)
         request.fetchLimit = 1
         return try? store.viewContext.fetch(request).first

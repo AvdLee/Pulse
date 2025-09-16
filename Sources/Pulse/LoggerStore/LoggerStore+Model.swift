@@ -11,8 +11,8 @@ extension LoggerStore {
         typealias Attribute = NSAttributeDescription
         typealias Relationship = NSRelationshipDescription
 
-        let session = Entity(class: LoggerSessionEntity.self)
-        let message = Entity(class: LoggerMessageEntity.self)
+        let session = Entity(class: RSLoggerSessionEntity.self)
+        let message = Entity(class: RSLoggerMessageEntity.self)
         let task = Entity(class: NetworkTaskEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)

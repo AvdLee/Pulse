@@ -26,10 +26,10 @@ struct PinButton: View {
 }
 
 struct PinView: View {
-    private var message: LoggerMessageEntity?
+    private var message: RSLoggerMessageEntity?
     @State private var isPinned = false
 
-    init(message: LoggerMessageEntity?) {
+    init(message: RSLoggerMessageEntity?) {
         self.message = message
     }
 
@@ -53,11 +53,11 @@ struct PinView: View {
 
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
-    private let message: LoggerMessageEntity?
+    private let message: RSLoggerMessageEntity?
     private let pins: LoggerStore.Pins?
     private var cancellables: [AnyCancellable] = []
 
-    init(_ message: LoggerMessageEntity) {
+    init(_ message: RSLoggerMessageEntity) {
         self.message = message
         self.pins = message.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()

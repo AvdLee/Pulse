@@ -226,8 +226,8 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
 
         if createSession {
-            let latestSession = try? viewContext.first(LoggerSessionEntity.self) {
-                $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
+            let latestSession = try? viewContext.first(RSLoggerSessionEntity.self) {
+                $0.sortDescriptors = [NSSortDescriptor(keyPath: \RSLoggerSessionEntity.createdAt, ascending: false)]
             }
             if let session = latestSession, manifest.version > Version(3, 3, 0) {
                 self.session = .init(id: session.id, startDate: session.createdAt)
@@ -276,13 +276,13 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     }
 
     private func saveEntity(for session: Session, info: Info.AppInfo) {
-        let existing = try? backgroundContext.first(LoggerSessionEntity.self) {
+        let existing = try? backgroundContext.first(RSLoggerSessionEntity.self) {
             $0.predicate = NSPredicate(format: "id == %@", session.id as NSUUID)
         }
         guard existing == nil else { return }
 
         // Start a new session
-        let entity = LoggerSessionEntity(context: backgroundContext)
+        let entity = RSLoggerSessionEntity(context: backgroundContext)
         entity.createdAt = session.startDate
         entity.id = session.id
         entity.version = info.version
@@ -373,7 +373,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.MessageCreated) {
-        let message = LoggerMessageEntity(context: backgroundContext)
+        let message = RSLoggerMessageEntity(context: backgroundContext)
         message.createdAt = event.createdAt
         message.level = event.level.rawValue
         message.label = event.label
@@ -555,7 +555,7 @@ extension LoggerStore {
         task.session = session.id
         task.taskDescription = event.taskDescription
 
-        let message = LoggerMessageEntity(context: backgroundContext)
+        let message = RSLoggerMessageEntity(context: backgroundContext)
         message.createdAt = event.createdAt
         message.level = Level.debug.rawValue
         message.label = event.label ?? "network"
@@ -778,8 +778,8 @@ extension LoggerStore {
 
 extension LoggerStore {
     /// Returns all recorded messages, least recent messages come first.
-    public func allMessages() throws -> [LoggerMessageEntity] {
-        try viewContext.fetch(LoggerMessageEntity.self, sortedBy: \.createdAt)
+    public func allMessages() throws -> [RSLoggerMessageEntity] {
+        try viewContext.fetch(RSLoggerMessageEntity.self, sortedBy: \.createdAt)
     }
 
     /// Returns all recorded network requests, least recent messages come first.
@@ -796,7 +796,7 @@ extension LoggerStore {
 
     private func _removeSessions(withIDs sessionIDs: Set<UUID>, isInverted: Bool = false) throws {
         try deleteEntities(for: {
-            let request = LoggerSessionEntity.fetchRequest()
+            let request = RSLoggerSessionEntity.fetchRequest()
             let predicate = NSPredicate(format: "id IN %@", sessionIDs)
             request.predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
             return request
@@ -817,9 +817,9 @@ extension LoggerStore {
     private func _removeAll() {
         switch document {
         case .package:
-            try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
+            try? deleteEntities(for: RSLoggerMessageEntity.fetchRequest())
             try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
-            try? deleteEntities(for: LoggerSessionEntity.fetchRequest())
+            try? deleteEntities(for: RSLoggerSessionEntity.fetchRequest())
             saveEntity(for: session, info: .make())
 
             try? Files.removeItem(at: blobsURL)
@@ -870,7 +870,7 @@ extension LoggerStore {
 
     /// Store export options.
     public struct ExportOptions: @unchecked Sendable {
-        /// A predicate describing which messages (``LoggerMessageEntity``) to export.
+        /// A predicate describing which messages (``RSLoggerMessageEntity``) to export.
         public var predicate: NSPredicate?
         /// A list of sessions to export.
         public var sessions: Set<UUID>?
@@ -1110,7 +1110,7 @@ extension LoggerStore {
 
     private func removeExpiredMessages() throws {
         let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
-        let sessionIDs = try backgroundContext.fetch(LoggerSessionEntity.self) {
+        let sessionIDs = try backgroundContext.fetch(RSLoggerSessionEntity.self) {
             $0.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
         }.map(\.id)
         if !sessionIDs.isEmpty {
@@ -1126,7 +1126,7 @@ extension LoggerStore {
         }
 
         // First remove some old messages
-        let messages = try backgroundContext.fetch(LoggerMessageEntity.self, sortedBy: \.createdAt, ascending: false)
+        let messages = try backgroundContext.fetch(RSLoggerMessageEntity.self, sortedBy: \.createdAt, ascending: false)
         let count = messages.count
         guard count > 10 else { return } // Sanity check
 
@@ -1141,7 +1141,7 @@ extension LoggerStore {
 
     private func removeMessages(with predicate: NSPredicate) throws {
         // Unlink blobs associated with the requests the store is about to remove
-        let messages = try backgroundContext.fetch(LoggerMessageEntity.self) {
+        let messages = try backgroundContext.fetch(RSLoggerMessageEntity.self) {
             $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, NSPredicate(format: "task != NULL")])
         }
         for message in messages {
@@ -1152,7 +1152,7 @@ extension LoggerStore {
         }
 
         // Remove messages using an efficient batch request
-        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
+        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "RSLoggerMessageEntity")
         deleteRequest.predicate = predicate
         try deleteEntities(for: deleteRequest)
     }
@@ -1221,7 +1221,7 @@ extension LoggerStore {
     private func _info() throws -> Info {
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
-        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
+        let messageCount = try backgroundContext.count(for: RSLoggerMessageEntity.self)
         let taskCount = try backgroundContext.count(for: NetworkTaskEntity.self)
         let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
 
@@ -1256,10 +1256,10 @@ extension LoggerStore {
             self.store = store
         }
 
-        public func togglePin(for message: LoggerMessageEntity) {
+        public func togglePin(for message: RSLoggerMessageEntity) {
             guard let store = store else { return }
             store.perform {
-                guard let message = $0.object(with: message.objectID) as? LoggerMessageEntity else { return }
+                guard let message = $0.object(with: message.objectID) as? RSLoggerMessageEntity else { return }
                 self._togglePin(for: message)
             }
         }
@@ -1275,7 +1275,7 @@ extension LoggerStore {
         public func removeAllPins() {
             guard let store = store else { return }
             store.perform {
-                let messages = try? $0.fetch(LoggerMessageEntity.self) {
+                let messages = try? $0.fetch(RSLoggerMessageEntity.self) {
                     $0.predicate = NSPredicate(format: "isPinned == YES")
                 }
                 for message in messages ?? [] {
@@ -1284,7 +1284,7 @@ extension LoggerStore {
             }
         }
 
-        private func _togglePin(for message: LoggerMessageEntity) {
+        private func _togglePin(for message: RSLoggerMessageEntity) {
             message.isPinned.toggle()
         }
     }

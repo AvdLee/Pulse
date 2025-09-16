@@ -37,7 +37,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         filters.options.focus != nil
     }
 
-    @Published private(set) var previousSession: LoggerSessionEntity?
+    @Published private(set) var previousSession: RSLoggerSessionEntity?
 
     let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
@@ -51,8 +51,8 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     private let store: LoggerStore
     private let environment: ConsoleEnvironment
     private let filters: ConsoleFiltersViewModel
-    private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
-    private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
+    private let sessions: ManagedObjectsObserver<RSLoggerSessionEntity>
+    private let pinsObserver: ManagedObjectsObserver<RSLoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
     private var filtersCancellable: AnyCancellable?
@@ -111,7 +111,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         filters.options.focus = NSPredicate(format: "self IN %@", entities)
     }
 
-    func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {
+    func buttonShowPreviousSessionTapped(for session: RSLoggerSessionEntity) {
         filters.criteria.shared.sessions.selection.insert(session.id)
         refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
@@ -120,7 +120,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         store.pins.removeAllPins()
     }
 
-    private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
+    private func refreshPreviousSessionButton(sessions: [RSLoggerSessionEntity]) {
         let selection = filters.criteria.shared.sessions.selection
         let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
             selection.contains($0.id)
@@ -222,7 +222,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     }
 }
 
-private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMessageEntity] {
+private func filter(pins: [RSLoggerMessageEntity], mode: ConsoleMode) -> [RSLoggerMessageEntity] {
     pins.filter {
         switch mode {
         case .all: return true

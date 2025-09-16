@@ -9,12 +9,12 @@ import CoreData
 
 public enum LoggerEntity {
     /// Regular log, not task attached.
-    case message(LoggerMessageEntity)
+    case message(RSLoggerMessageEntity)
     /// Either a log with an attached task, or a task itself.
     case task(NetworkTaskEntity)
 
     public init(_ entity: NSManagedObject) {
-        if let message = entity as? LoggerMessageEntity {
+        if let message = entity as? RSLoggerMessageEntity {
             if let task = message.task {
                 self = .task(task)
             } else {
@@ -33,7 +33,7 @@ public enum LoggerEntity {
     }
 }
 
-extension LoggerMessageEntity: Identifiable {
+extension RSLoggerMessageEntity: Identifiable {
     public var id: NSManagedObjectID { objectID }
 }
 
@@ -73,7 +73,7 @@ extension NetworkTaskEntity {
     }
 }
 
-extension LoggerMessageEntity {
+extension RSLoggerMessageEntity {
     var logLevel: LoggerStore.Level {
         LoggerStore.Level(rawValue: level) ?? .debug
     }
@@ -97,7 +97,7 @@ extension NetworkTaskEntity.State {
     }
 }
 
-extension LoggerSessionEntity {
+extension RSLoggerSessionEntity {
     var formattedDate: String {
         formattedDate(isCompact: false)
     }

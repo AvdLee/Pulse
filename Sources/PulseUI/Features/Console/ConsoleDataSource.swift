@@ -62,7 +62,7 @@ public final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelega
 
         switch mode {
         case .all, .logs:
-            entityName = "\(LoggerMessageEntity.self)"
+            entityName = "\(RSLoggerMessageEntity.self)"
             sortKey = options.messageSortBy.key
             grouping = options.messageGroupBy
         case .network:
@@ -205,7 +205,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             let rawValue = Int16(Int(section.name) ?? 0)
             return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
         case .session:
-            let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
+            let date = (section.objects?.last as? RSLoggerMessageEntity)?.createdAt
             return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break

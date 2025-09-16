@@ -103,9 +103,9 @@ final class ConsoleSearchOperation {
         }
     }
 
-    // MARK: Search (LoggerMessageEntity)
+    // MARK: Search (RSLoggerMessageEntity)
 
-    private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+    private func _search(_ message: RSLoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         guard isMatching(message, filters: parameters.filters) else {
             return nil
         }
@@ -115,7 +115,7 @@ final class ConsoleSearchOperation {
         return search(in: message, parameters: parameters)
     }
 
-    private func isMatching(_ message: LoggerMessageEntity, filters: [ConsoleSearchFilter]) -> Bool {
+    private func isMatching(_ message: RSLoggerMessageEntity, filters: [ConsoleSearchFilter]) -> Bool {
         Dictionary(grouping: filters.map(\.filter), by: \.name)
             .compactMap { $0.value as? ([any ConsoleSearchLogFilterProtocol]) }
             .allSatisfy { filters in
@@ -123,7 +123,7 @@ final class ConsoleSearchOperation {
             }
     }
 
-    private func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+    private func search(in message: RSLoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
         let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
         for scope in scopes {
@@ -192,7 +192,7 @@ final class ConsoleSearchOperation {
                     occurrences += ConsoleSearchOperation.search(string, parameters, scope)
                 }
             case .message, .metadata:
-                break // Applies only to LoggerMessageEntity
+                break // Applies only to RSLoggerMessageEntity
             }
         }
         return occurrences.isEmpty ? nil : occurrences

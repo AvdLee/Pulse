@@ -531,7 +531,7 @@ See [Introducing Pulse 2.0](https://kean.blog/post/pulse-2) to learn about the n
 ### PulseCore
 
 - Rename the folder that Pulse creates in Logs/ directory to `com.github.kean.logger`. Previously, it was using `.pulse` as a suffix which was conflicting with the extension used for [Pulse documents](https://kean.blog/post/pulse-store) - [#48](https://github.com/kean/Pulse/pull/48), thanks to [Agapov Alexey](https://github.com/AgapovOne)
-- Add `filename` to `LoggerMessageEntity`
+- Add `filename` to `RSLoggerMessageEntity`
 - Add URLSession configuration information to logged network requests, including [httpAdditionalHeaders](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders)
 - Coalesce disk writes to reduce disk usage
 - Perform less work on the logger's caller's thread

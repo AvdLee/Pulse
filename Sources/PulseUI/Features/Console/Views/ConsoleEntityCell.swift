@@ -30,7 +30,7 @@ struct ConsoleEntityCell: View {
 
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleMessageCell: View {
-    let message: LoggerMessageEntity
+    let message: RSLoggerMessageEntity
 
     @State private var shareItems: ShareItems?
     @Binding var selection: ConsoleSelectedItem?
