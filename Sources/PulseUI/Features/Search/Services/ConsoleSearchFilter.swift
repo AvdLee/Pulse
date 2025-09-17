@@ -20,7 +20,7 @@ protocol ConsoleSearchLogFilterProtocol: ConsoleSearchFilterProtocol {
 }
 
 protocol ConsoleSearchNetworkFilterProtocol: ConsoleSearchFilterProtocol {
-    func isMatch(_ task: NetworkTaskEntity) -> Bool
+    func isMatch(_ task: RSNetworkTaskEntity) -> Bool
 }
 
 extension ConsoleSearchFilterProtocol {
@@ -95,7 +95,7 @@ struct ConsoleSearchFilterStatusCode: ConsoleSearchNetworkFilterProtocol, Hashab
     var values: [ConsoleSearchRange<Int>]
     var valueExamples: [String] { ["2XX", "304", "400-404"] }
 
-    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+    func isMatch(_ task: RSNetworkTaskEntity) -> Bool {
         values.compactMap { $0.range }.contains {
             $0.contains(Int(task.statusCode))
         }
@@ -107,7 +107,7 @@ struct ConsoleSearchFilterHost: ConsoleSearchNetworkFilterProtocol, Hashable, Co
     var values: [String]
     var valueExamples: [String] { ["example.com"] }
 
-    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+    func isMatch(_ task: RSNetworkTaskEntity) -> Bool {
         guard let host = task.url.flatMap(URL.init)?.host else {
             return false
         }
@@ -120,7 +120,7 @@ struct ConsoleSearchFilterMethod: ConsoleSearchNetworkFilterProtocol, Hashable, 
     var values: [HTTPMethod]
     var valueExamples: [String] { ["GET"] }
 
-    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+    func isMatch(_ task: RSNetworkTaskEntity) -> Bool {
         guard let method = HTTPMethod(rawValue: task.httpMethod ?? "") else { return false }
         return Set(values).contains(method)
     }
@@ -131,7 +131,7 @@ struct ConsoleSearchFilterPath: ConsoleSearchNetworkFilterProtocol, Hashable, Co
     var values: [String]
     var valueExamples: [String] { ["/example"] }
 
-    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+    func isMatch(_ task: RSNetworkTaskEntity) -> Bool {
         guard let path = task.url.flatMap(URL.init)?.path else {
             return false
         }

@@ -66,7 +66,7 @@ public final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelega
             sortKey = options.messageSortBy.key
             grouping = options.messageGroupBy
         case .network:
-            entityName = "\(NetworkTaskEntity.self)"
+            entityName = "\(RSNetworkTaskEntity.self)"
             sortKey = options.taskSortBy.key
             grouping = options.taskGroupBy
         }
@@ -220,7 +220,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             return StatusCodeFormatter.string(for: rawValue)
         case .requestState:
             let rawValue = Int16(Int(section.name) ?? 0)
-            guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
+            guard let state = RSNetworkTaskEntity.State(rawValue: rawValue) else {
                 return "Unknown State"
             }
             switch state {
@@ -229,7 +229,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             case .failure: return "Failure"
             }
         case .session:
-            let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
+            let date = (section.objects?.last as? RSNetworkTaskEntity)?.createdAt
             return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break

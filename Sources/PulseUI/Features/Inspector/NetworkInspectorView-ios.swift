@@ -11,7 +11,7 @@ import Combine
 
 @available(iOS 15, visionOS 1.0, *)
 struct NetworkInspectorView: View {
-    @ObservedObject var task: NetworkTaskEntity
+    @ObservedObject var task: RSNetworkTaskEntity
 
     @State private var shareItems: ShareItems?
     @ObservedObject private var settings: UserSettings = .shared

@@ -48,7 +48,7 @@ final class ProgressViewModel: ObservableObject {
         self.details = details
     }
 
-    init(task: NetworkTaskEntity) {
+    init(task: RSNetworkTaskEntity) {
         self.title = ProgressViewModel.title(for: task)
         if task.state == .pending {
             observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
@@ -59,7 +59,7 @@ final class ProgressViewModel: ObservableObject {
         }
     }
 
-    static func title(for task: NetworkTaskEntity) -> String {
+    static func title(for task: RSNetworkTaskEntity) -> String {
         switch task.type ?? .dataTask {
         case .downloadTask: return "Downloading"
         case .uploadTask: return "Uploading"
@@ -67,7 +67,7 @@ final class ProgressViewModel: ObservableObject {
         }
     }
 
-    static func details(for task: NetworkTaskEntity) -> String? {
+    static func details(for task: RSNetworkTaskEntity) -> String? {
         guard let progress = task.progress else {
             return nil
         }
@@ -81,14 +81,14 @@ final class ProgressViewModel: ObservableObject {
         return total > 0 ? "\(lhs) / \(rhs)" : lhs
     }
 
-    private func register(for progress: NetworkTaskProgressEntity) {
+    private func register(for progress: RSNetworkTaskProgressEntity) {
         self.refresh(with: progress)
         observer2 = progress.objectWillChange.sink { [weak self] in
             self?.refresh(with: progress)
         }
     }
 
-    private func refresh(with progress: NetworkTaskProgressEntity) {
+    private func refresh(with progress: RSNetworkTaskProgressEntity) {
         let completed = progress.completedUnitCount
         let total = progress.totalUnitCount
 

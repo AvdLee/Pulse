@@ -59,11 +59,11 @@ enum ContextMenu {
     }
 
     struct NetworkTaskContextMenuItems: View {
-        let task: NetworkTaskEntity
+        let task: RSNetworkTaskEntity
 #if os(iOS) || os(visionOS)
         @Binding private(set) var sharedItems: ShareItems?
 #else
-        @Binding private(set) var sharedTask: NetworkTaskEntity?
+        @Binding private(set) var sharedTask: RSNetworkTaskEntity?
 #endif
 
         var isDetailsView = false
@@ -96,7 +96,7 @@ enum ContextMenu {
     }
 
     struct NetworkTaskFilterMenu: View {
-        let task: NetworkTaskEntity
+        let task: RSNetworkTaskEntity
 
         @EnvironmentObject private var environment: ConsoleEnvironment
         @EnvironmentObject private var filters: ConsoleFiltersViewModel
@@ -143,7 +143,7 @@ enum ContextMenu {
     }
 
     struct NetworkTaskShareMenu: View {
-        let task: NetworkTaskEntity
+        let task: RSNetworkTaskEntity
         @Binding var shareItems: ShareItems?
 
         @Environment(\.store) private var store
@@ -168,7 +168,7 @@ enum ContextMenu {
     }
 
     struct NetworkTaskCopyMenu: View {
-        let task: NetworkTaskEntity
+        let task: RSNetworkTaskEntity
 
         var body: some View {
             Menu(content: content) {

@@ -22,12 +22,12 @@ public final class RSLoggerMessageEntity: NSManagedObject {
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
     @NSManaged public var label: String
     @NSManaged public var rawMetadata: String
-    @NSManaged public var task: NetworkTaskEntity?
+    @NSManaged public var task: RSNetworkTaskEntity?
 
     public lazy var metadata = { KeyValueEncoding.decodeKeyValuePairs(rawMetadata) }()
 }
 
-public final class NetworkTaskEntity: NSManagedObject {
+public final class RSNetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
     @NSManaged public var session: UUID
@@ -71,7 +71,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     ///
     /// - note: The entity is created lazily when the first progress report
     /// is delivered. If no progress updates are delivered, it's never created.
-    @NSManaged public var progress: NetworkTaskProgressEntity?
+    @NSManaged public var progress: RSNetworkTaskProgressEntity?
 
     /// Total request duration end date.
     @NSManaged public var duration: Double
@@ -80,16 +80,16 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     // MARK: Details
 
-    @NSManaged public var originalRequest: NetworkRequestEntity?
-    @NSManaged public var currentRequest: NetworkRequestEntity?
-    @NSManaged public var response: NetworkResponseEntity?
-    @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
+    @NSManaged public var originalRequest: RSNetworkRequestEntity?
+    @NSManaged public var currentRequest: RSNetworkRequestEntity?
+    @NSManaged public var response: RSNetworkResponseEntity?
+    @NSManaged public var transactions: Set<RSNetworkTransactionMetricsEntity>
     @NSManaged var rawMetadata: String?
 
     /// The request body handle.
-    @NSManaged public var requestBody: LoggerBlobHandleEntity?
+    @NSManaged public var requestBody: RSLoggerBlobHandleEntity?
     /// The response body handle.
-    @NSManaged public var responseBody: LoggerBlobHandleEntity?
+    @NSManaged public var responseBody: RSLoggerBlobHandleEntity?
     /// The size of the request body.
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
@@ -118,7 +118,7 @@ public final class NetworkTaskEntity: NSManagedObject {
         return error?.error
     }()
 
-    public var orderedTransactions: [NetworkTransactionMetricsEntity] {
+    public var orderedTransactions: [RSNetworkTransactionMetricsEntity] {
         transactions.sorted { $0.index < $1.index }
     }
 
@@ -144,18 +144,18 @@ public final class NetworkTaskEntity: NSManagedObject {
 }
 
 /// Indicates current download or upload progress.
-public final class NetworkTaskProgressEntity: NSManagedObject {
+public final class RSNetworkTaskProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
 }
 
-public final class NetworkTransactionMetricsEntity: NSManagedObject {
+public final class RSNetworkTransactionMetricsEntity: NSManagedObject {
     @NSManaged public var index: Int16
     @NSManaged public var rawFetchType: Int16
-    @NSManaged public var request: NetworkRequestEntity
-    @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var request: RSNetworkRequestEntity
+    @NSManaged public var response: RSNetworkResponseEntity?
     @NSManaged public var networkProtocol: String?
     @NSManaged public var localAddress: String?
     @NSManaged public var remoteAddress: String?
@@ -227,7 +227,7 @@ public final class NetworkTransactionMetricsEntity: NSManagedObject {
     }
 }
 
-public final class NetworkRequestEntity: NSManagedObject {
+public final class RSNetworkRequestEntity: NSManagedObject {
     // MARK: Details
 
     @NSManaged public var url: String?
@@ -255,7 +255,7 @@ public final class NetworkRequestEntity: NSManagedObject {
     public lazy var headers: [String: String] = { KeyValueEncoding.decodeKeyValuePairs(httpHeaders) }()
 }
 
-public final class NetworkResponseEntity: NSManagedObject {
+public final class RSNetworkResponseEntity: NSManagedObject {
     @NSManaged public var statusCode: Int16
     @NSManaged public var httpHeaders: String
 
@@ -271,7 +271,7 @@ public final class NetworkResponseEntity: NSManagedObject {
 }
 
 /// Doesn't contain any data, just the key and some additional payload.
-public final class LoggerBlobHandleEntity: NSManagedObject {
+public final class RSLoggerBlobHandleEntity: NSManagedObject {
     /// A blob hash (sha1, stored in a binary format).
     @NSManaged public var key: Data
 
@@ -323,7 +323,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// on any thread.
     ///
     /// - warning: Not meant to be used outside of the framework.
-    public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
+    public static func getData(for entity: RSLoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
         let inlineData = entity.inlineData
         let key = entity.key
         let isCompressed = !entity.isUncompressed

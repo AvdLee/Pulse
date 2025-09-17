@@ -30,7 +30,7 @@ final class NetworkRequestInfoCellViewModel {
     let url: String
     let render: () -> NSAttributedString
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    init(task: RSNetworkTaskEntity, store: LoggerStore) {
         self.httpMethod = task.httpMethod ?? "GET"
         self.url = task.url ?? "–"
         self.render = {
@@ -40,7 +40,7 @@ final class NetworkRequestInfoCellViewModel {
         }
     }
 
-    init(transaction: NetworkTransactionMetricsEntity) {
+    init(transaction: RSNetworkTransactionMetricsEntity) {
         self.httpMethod = transaction.request.httpMethod ?? "GET"
         self.url = transaction.request.url ?? "–"
         self.render = { TextRenderer(options: .sharing).make { $0.render(transaction) } }

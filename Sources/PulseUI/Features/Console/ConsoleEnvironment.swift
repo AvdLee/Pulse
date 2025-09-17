@@ -73,9 +73,9 @@ final class ConsoleEnvironment: ObservableObject {
         )
 
         self.taskCountObserver = ManagedObjectsCountObserver(
-            entity: NetworkTaskEntity.self,
+            entity: RSNetworkTaskEntity.self,
             context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)
+            sortDescriptior: NSSortDescriptor(keyPath: \RSNetworkTaskEntity.createdAt, ascending: false)
         )
 
         bind()

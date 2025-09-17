@@ -74,9 +74,9 @@ private struct _ConsoleMessageCell: View {
 
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleTaskCell: View {
-    let task: NetworkTaskEntity
+    let task: RSNetworkTaskEntity
     @State private var shareItems: ShareItems?
-    @State private var sharedTask: NetworkTaskEntity?
+    @State private var sharedTask: RSNetworkTaskEntity?
     @Environment(\.store) private var store
     @EnvironmentObject private var environment: ConsoleEnvironment
     @Binding var selection: ConsoleSelectedItem?

@@ -32,7 +32,7 @@ struct NetworkResponseBodyCellViewModel {
     let isEnabled: Bool
     let detailsViewModel: NetworkInspectorResponseBodyViewModel
 
-    init(task: NetworkTaskEntity) {
+    init(task: RSNetworkTaskEntity) {
         let size = task.responseBodySize
         self.details = size > 0 ? ByteCountFormatter.string(fromByteCount: size) : "Empty"
         self.isEnabled = size > 0

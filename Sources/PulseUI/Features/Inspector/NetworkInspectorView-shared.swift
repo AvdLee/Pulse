@@ -8,7 +8,7 @@ import Pulse
 @available(iOS 15, visionOS 1.0, *)
 extension NetworkInspectorView {
     @ViewBuilder
-    static func makeRequestSection(task: NetworkTaskEntity, isCurrentRequest: Bool) -> some View {
+    static func makeRequestSection(task: RSNetworkTaskEntity, isCurrentRequest: Bool) -> some View {
         let url = URL(string: task.url ?? "")
         NetworkRequestBodyCell(viewModel: .init(task: task))
         if isCurrentRequest {
@@ -21,7 +21,7 @@ extension NetworkInspectorView {
     }
 
     @ViewBuilder
-    static func makeResponseSection(task: NetworkTaskEntity) -> some View {
+    static func makeResponseSection(task: RSNetworkTaskEntity) -> some View {
         let url = URL(string: task.url ?? "")
         NetworkResponseBodyCell(viewModel: .init(task: task))
         NetworkHeadersCell(viewModel: .init(title: "Response Headers", headers: task.response?.headers))
@@ -29,7 +29,7 @@ extension NetworkInspectorView {
     }
 
     @ViewBuilder
-    static func makeHeaderView(task: NetworkTaskEntity, store: LoggerStore) -> some View {
+    static func makeHeaderView(task: RSNetworkTaskEntity, store: LoggerStore) -> some View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                 .hidden()

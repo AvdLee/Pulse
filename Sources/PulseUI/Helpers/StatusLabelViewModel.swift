@@ -11,7 +11,7 @@ public struct StatusLabelViewModel {
     let tint: Color
     let title: String
 
-    public init(task: NetworkTaskEntity, store: LoggerStore) {
+    public init(task: RSNetworkTaskEntity, store: LoggerStore) {
         guard let state = task.state(in: store) else {
             self.systemImage = "questionmark.diamond.fill"
             self.tint = .secondary
@@ -34,7 +34,7 @@ public struct StatusLabelViewModel {
         }
     }
 
-    init(transaction: NetworkTransactionMetricsEntity) {
+    init(transaction: RSNetworkTransactionMetricsEntity) {
         if let response = transaction.response {
             if response.isSuccess {
                 self.systemImage = "checkmark.circle.fill"
@@ -58,7 +58,7 @@ public struct StatusLabelViewModel {
     }
 }
 
-private extension NetworkResponseEntity {
+private extension RSNetworkResponseEntity {
     var isSuccess: Bool {
         (100..<400).contains(statusCode)
     }

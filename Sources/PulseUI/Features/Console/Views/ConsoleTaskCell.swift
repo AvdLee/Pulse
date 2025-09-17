@@ -9,7 +9,7 @@ import CoreData
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleTaskCell: View {
-    @ObservedObject var task: NetworkTaskEntity
+    @ObservedObject var task: RSNetworkTaskEntity
     var isDisclosureNeeded = false
 
     @ObservedObject private var settings: UserSettings = .shared

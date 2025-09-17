@@ -23,10 +23,10 @@ Logger and network inspector for Apple platforms.
 ### Core Data Entities
 
 - ``RSLoggerMessageEntity``
-- ``LoggerBlobHandleEntity``
+- ``RSLoggerBlobHandleEntity``
 - ``RSLoggerSessionEntity``
-- ``NetworkTaskEntity``
-- ``NetworkTaskProgressEntity``
-- ``NetworkTransactionMetricsEntity``
-- ``NetworkRequestEntity``
-- ``NetworkResponseEntity``
+- ``RSNetworkTaskEntity``
+- ``RSNetworkTaskProgressEntity``
+- ``RSNetworkTransactionMetricsEntity``
+- ``RSNetworkRequestEntity``
+- ``RSNetworkResponseEntity``

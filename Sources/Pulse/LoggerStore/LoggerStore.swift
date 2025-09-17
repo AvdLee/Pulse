@@ -61,10 +61,10 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
     // A single task can generate multiple events. This cache dramatically reduces
     // the number of database fetches.
-    private var tasksCache: [UUID: NetworkTaskEntity] = [:]
+    private var tasksCache: [UUID: RSNetworkTaskEntity] = [:]
     // There are cached on a per-task level
-    private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
-    private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
+    private var requestsCache: [NetworkLogger.Request: RSNetworkRequestEntity] = [:]
+    private var responsesCache: [NetworkLogger.Response: RSNetworkResponseEntity] = [:]
 
     // MARK: Shared
 
@@ -393,7 +393,7 @@ extension LoggerStore {
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
         entity.httpMethod = event.originalRequest.httpMethod
-        entity.requestState = NetworkTaskEntity.State.pending.rawValue
+        entity.requestState = RSNetworkTaskEntity.State.pending.rawValue
         entity.originalRequest = makeRequest(for: event.originalRequest)
         entity.currentRequest = event.currentRequest.map(makeRequest)
         requestsCache = [:]
@@ -405,7 +405,7 @@ extension LoggerStore {
             return
         }
         let progress = request.progress ?? {
-            let progress = NetworkTaskProgressEntity(context: backgroundContext)
+            let progress = RSNetworkTaskProgressEntity(context: backgroundContext)
             request.progress = progress
             return progress
         }()
@@ -422,7 +422,7 @@ extension LoggerStore {
         entity.statusCode = Int32(event.response?.statusCode ?? 0)
         entity.responseContentType = event.response?.contentType?.type
         let isFailure = event.error != nil || event.response?.isSuccess == false
-        entity.requestState = (isFailure ? NetworkTaskEntity.State.failure : .success).rawValue
+        entity.requestState = (isFailure ? RSNetworkTaskEntity.State.failure : .success).rawValue
         entity.taskDescription = event.taskDescription
 
         // Populate response/request data
@@ -525,27 +525,27 @@ extension LoggerStore {
         return data
     }
 
-    private func findTask(forTaskId taskId: UUID) -> NetworkTaskEntity? {
+    private func findTask(forTaskId taskId: UUID) -> RSNetworkTaskEntity? {
         if let task = tasksCache[taskId] {
             return task
         }
-        return try? backgroundContext.first(NetworkTaskEntity.self) {
+        return try? backgroundContext.first(RSNetworkTaskEntity.self) {
             $0.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
         }
     }
 
-    private func findOrCreateTask(for event: NetworkTaskEvent) -> NetworkTaskEntity {
+    private func findOrCreateTask(for event: NetworkTaskEvent) -> RSNetworkTaskEntity {
         if let entity = findTask(forTaskId: event.taskId) {
             return entity
         }
         return createTask(for: event)
     }
 
-    private func createTask(for event: NetworkTaskEvent) -> NetworkTaskEntity {
+    private func createTask(for event: NetworkTaskEvent) -> RSNetworkTaskEntity {
         if let entity = tasksCache[event.taskId] {
             return entity // Defensive code in case createTask gets called more than once
         }
-        let task = NetworkTaskEntity(context: backgroundContext)
+        let task = RSNetworkTaskEntity(context: backgroundContext)
         task.taskId = event.taskId
         task.taskType = event.taskType.rawValue
         task.createdAt = event.createdAt
@@ -562,7 +562,7 @@ extension LoggerStore {
         message.session = session.id
         message.file = ""
         message.function = ""
-        message.line = Int32(NetworkTaskEntity.State.pending.rawValue)
+        message.line = Int32(RSNetworkTaskEntity.State.pending.rawValue)
         message.text = event.originalRequest.url?.absoluteString ?? ""
 
         message.task = task
@@ -573,11 +573,11 @@ extension LoggerStore {
         return task
     }
 
-    private func makeRequest(for request: NetworkLogger.Request) -> NetworkRequestEntity {
+    private func makeRequest(for request: NetworkLogger.Request) -> RSNetworkRequestEntity {
         if let entity = requestsCache[request] {
             return entity
         }
-        let entity = NetworkRequestEntity(context: backgroundContext)
+        let entity = RSNetworkRequestEntity(context: backgroundContext)
         entity.url = request.url?.absoluteString
         entity.httpMethod = request.httpMethod
         entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(request.headers)
@@ -592,19 +592,19 @@ extension LoggerStore {
         return entity
     }
 
-    private func makeResponse(for response: NetworkLogger.Response) -> NetworkResponseEntity {
+    private func makeResponse(for response: NetworkLogger.Response) -> RSNetworkResponseEntity {
         if let entity = responsesCache[response] {
             return entity
         }
-        let entity = NetworkResponseEntity(context: backgroundContext)
+        let entity = RSNetworkResponseEntity(context: backgroundContext)
         entity.statusCode = Int16(response.statusCode ?? 0)
         entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(response.headers)
         responsesCache[response] = entity
         return entity
     }
 
-    private func makeTransaction(at index: Int, transaction: NetworkLogger.TransactionMetrics) -> NetworkTransactionMetricsEntity {
-        let entity = NetworkTransactionMetricsEntity(context: backgroundContext)
+    private func makeTransaction(at index: Int, transaction: NetworkLogger.TransactionMetrics) -> RSNetworkTransactionMetricsEntity {
+        let entity = RSNetworkTransactionMetricsEntity(context: backgroundContext)
         entity.index = Int16(index)
         entity.rawFetchType = Int16(transaction.fetchType.rawValue)
         entity.request = makeRequest(for: transaction.request)
@@ -644,7 +644,7 @@ extension LoggerStore {
 
     // MARK: - Managing Blobs
 
-    private func storeBlob(_ data: Data, contentType: NetworkLogger.ContentType?) -> LoggerBlobHandleEntity? {
+    private func storeBlob(_ data: Data, contentType: NetworkLogger.ContentType?) -> RSLoggerBlobHandleEntity? {
         let data = preprocessData(data, contentType: contentType)
 
         guard !data.isEmpty else {
@@ -655,7 +655,7 @@ extension LoggerStore {
             return nil
         }
         let key = data.sha1
-        let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
+        let existingEntity = try? backgroundContext.first(RSLoggerBlobHandleEntity.self) {
             $0.predicate = NSPredicate(format: "key == %@", key as NSData)
         }
         if let entity = existingEntity {
@@ -663,7 +663,7 @@ extension LoggerStore {
             return entity
         }
 
-        let entity = LoggerBlobHandleEntity(context: backgroundContext)
+        let entity = RSLoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
         entity.rawContentType = contentType?.rawValue
@@ -686,7 +686,7 @@ extension LoggerStore {
         return entity
     }
 
-    private func unlink(_ blob: LoggerBlobHandleEntity) {
+    private func unlink(_ blob: RSLoggerBlobHandleEntity) {
         blob.linkCount -= 1
         if blob.linkCount == 0 {
             if blob.inlineData == nil {
@@ -700,7 +700,7 @@ extension LoggerStore {
         blobsURL.appending(filename: key)
     }
 
-    func getDecompressedData(for entity: LoggerBlobHandleEntity) -> Data? {
+    func getDecompressedData(for entity: RSLoggerBlobHandleEntity) -> Data? {
         getDecompressedData(for: entity.inlineData, key: entity.key, isCompressed: !entity.isUncompressed)
     }
 
@@ -783,8 +783,8 @@ extension LoggerStore {
     }
 
     /// Returns all recorded network requests, least recent messages come first.
-    public func allTasks() throws -> [NetworkTaskEntity] {
-        try viewContext.fetch(NetworkTaskEntity.self, sortedBy: \.createdAt)
+    public func allTasks() throws -> [RSNetworkTaskEntity] {
+        try viewContext.fetch(RSNetworkTaskEntity.self, sortedBy: \.createdAt)
     }
 
     /// Removes sessions with the given IDs.
@@ -818,7 +818,7 @@ extension LoggerStore {
         switch document {
         case .package:
             try? deleteEntities(for: RSLoggerMessageEntity.fetchRequest())
-            try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
+            try? deleteEntities(for: RSLoggerBlobHandleEntity.fetchRequest())
             try? deleteEntities(for: RSLoggerSessionEntity.fetchRequest())
             saveEntity(for: session, info: .make())
 
@@ -970,7 +970,7 @@ extension LoggerStore {
     /// Moves the blobs from the source store to the `target` store, keeping
     /// only the entities present in the `target` store.
     private func _exportBlobs(to target: LoggerStore) throws {
-        let blobs = try target.backgroundContext.fetch(LoggerBlobHandleEntity.self) {
+        let blobs = try target.backgroundContext.fetch(RSLoggerBlobHandleEntity.self) {
             $0.predicate = NSPredicate(format: "inlineData = nil")
         }
         Files.createDirectoryIfNeeded(at: target.blobsURL)
@@ -1163,11 +1163,11 @@ extension LoggerStore {
         guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
         }
-        let tasks = try backgroundContext.fetch(NetworkTaskEntity.self, sortedBy: \.createdAt) {
+        let tasks = try backgroundContext.fetch(RSNetworkTaskEntity.self, sortedBy: \.createdAt) {
             $0.predicate = NSPredicate(format: "requestBody != NULL OR responseBody != NULL")
         }
         let targetSize = Int(Double(configuration.blobSizeLimit) * configuration.trimRatio)
-        func _unlink(_ blob: LoggerBlobHandleEntity) {
+        func _unlink(_ blob: RSLoggerBlobHandleEntity) {
             unlink(blob)
             currentSize -= Int64(blob.size)
         }
@@ -1184,7 +1184,7 @@ extension LoggerStore {
     }
 
     private func getBlobsSize(isDecompressed: Bool = false) throws -> Int64 {
-        let request = LoggerBlobHandleEntity.fetchRequest()
+        let request = RSLoggerBlobHandleEntity.fetchRequest()
 
         let description = NSExpressionDescription()
         description.name = "sum"
@@ -1222,8 +1222,8 @@ extension LoggerStore {
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
         let messageCount = try backgroundContext.count(for: RSLoggerMessageEntity.self)
-        let taskCount = try backgroundContext.count(for: NetworkTaskEntity.self)
-        let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
+        let taskCount = try backgroundContext.count(for: RSNetworkTaskEntity.self)
+        let blobCount = try backgroundContext.count(for: RSLoggerBlobHandleEntity.self)
 
         return Info(
             storeId: manifest.storeId,
@@ -1264,10 +1264,10 @@ extension LoggerStore {
             }
         }
 
-        public func togglePin(for task: NetworkTaskEntity) {
+        public func togglePin(for task: RSNetworkTaskEntity) {
             guard let store = store else { return }
             store.perform {
-                guard let task = $0.object(with: task.objectID) as? NetworkTaskEntity else { return }
+                guard let task = $0.object(with: task.objectID) as? RSNetworkTaskEntity else { return }
                 task.message.map(self._togglePin)
             }
         }

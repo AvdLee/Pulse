@@ -13,12 +13,12 @@ extension LoggerStore {
 
         let session = Entity(class: RSLoggerSessionEntity.self)
         let message = Entity(class: RSLoggerMessageEntity.self)
-        let task = Entity(class: NetworkTaskEntity.self)
-        let progress = Entity(class: NetworkTaskProgressEntity.self)
-        let request = Entity(class: NetworkRequestEntity.self)
-        let response = Entity(class: NetworkResponseEntity.self)
-        let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
-        let blob = Entity(class: LoggerBlobHandleEntity.self)
+        let task = Entity(class: RSNetworkTaskEntity.self)
+        let progress = Entity(class: RSNetworkTaskProgressEntity.self)
+        let request = Entity(class: RSNetworkRequestEntity.self)
+        let response = Entity(class: RSNetworkResponseEntity.self)
+        let transaction = Entity(class: RSNetworkTransactionMetricsEntity.self)
+        let blob = Entity(class: RSLoggerBlobHandleEntity.self)
 
         session.properties = [
             Attribute(name: "id", type: .UUIDAttributeType),

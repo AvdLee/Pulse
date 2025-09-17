@@ -33,7 +33,7 @@ final class NetworkRequestStatusSectionViewModel {
     let requestViewModel: NetworkRequestInfoCellViewModel
     let errorDetailsViewModel: KeyValueSectionViewModel?
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    init(task: RSNetworkTaskEntity, store: LoggerStore) {
         self.status = NetworkRequestStatusCellModel(task: task, store: store)
         self.errorDescription = task.state == .failure ? task.errorDebugDescription : nil
         self.requestViewModel = NetworkRequestInfoCellViewModel(task: task, store: store)

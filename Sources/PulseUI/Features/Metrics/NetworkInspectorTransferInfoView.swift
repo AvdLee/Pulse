@@ -146,7 +146,7 @@ struct NetworkInspectorTransferInfoViewModel {
         headersBytesReceived = "–"
     }
 
-    init(task: NetworkTaskEntity) {
+    init(task: RSNetworkTaskEntity) {
         self.init(transferSize: task.totalTransferSize)
     }
 

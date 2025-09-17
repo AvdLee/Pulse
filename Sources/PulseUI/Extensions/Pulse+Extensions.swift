@@ -11,7 +11,7 @@ public enum LoggerEntity {
     /// Regular log, not task attached.
     case message(RSLoggerMessageEntity)
     /// Either a log with an attached task, or a task itself.
-    case task(NetworkTaskEntity)
+    case task(RSNetworkTaskEntity)
 
     public init(_ entity: NSManagedObject) {
         if let message = entity as? RSLoggerMessageEntity {
@@ -20,14 +20,14 @@ public enum LoggerEntity {
             } else {
                 self = .message(message)
             }
-        } else if let task = entity as? NetworkTaskEntity {
+        } else if let task = entity as? RSNetworkTaskEntity {
             self = .task(task)
         } else {
             fatalError("Unsupported entity: \(entity)")
         }
     }
 
-    public var task: NetworkTaskEntity? {
+    public var task: RSNetworkTaskEntity? {
         if case .task(let task) = self { return task }
         return nil
     }
@@ -37,11 +37,11 @@ extension RSLoggerMessageEntity: Identifiable {
     public var id: NSManagedObjectID { objectID }
 }
 
-extension NetworkTaskEntity: Identifiable {
+extension RSNetworkTaskEntity: Identifiable {
     public var id: NSManagedObjectID { objectID }
 }
 
-extension NetworkTaskEntity {
+extension RSNetworkTaskEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
             contentType: originalRequest?.contentType,
@@ -64,7 +64,7 @@ extension NetworkTaskEntity {
 
     /// - returns `nil` if the task is an unknown state. It may happen if the
     /// task is pending, but it's from the previous app run.
-    func state(in store: LoggerStore) -> NetworkTaskEntity.State? {
+    func state(in store: LoggerStore) -> RSNetworkTaskEntity.State? {
         let state = self.state
         if state == .pending && self.session != store.session.id {
             return nil
@@ -79,7 +79,7 @@ extension RSLoggerMessageEntity {
     }
 }
 
-extension NetworkTaskEntity.State {
+extension RSNetworkTaskEntity.State {
     public var tintColor: Color {
         switch self {
         case .pending: return .orange

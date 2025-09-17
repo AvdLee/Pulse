@@ -10,11 +10,11 @@ import Pulse
 import Combine
 
 struct NetworkInspectorView: View {
-    @ObservedObject var task: NetworkTaskEntity
+    @ObservedObject var task: RSNetworkTaskEntity
     @State var selectedTab: NetworkInspectorTab
     @Environment(\.store) private var store
 
-    init(task: NetworkTaskEntity,
+    init(task: RSNetworkTaskEntity,
          tab: NetworkInspectorTab = NetworkInspectorPreferences().selectedTab) {
         self.task = task
         self._selectedTab = State(initialValue: tab)

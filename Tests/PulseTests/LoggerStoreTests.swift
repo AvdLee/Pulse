@@ -116,11 +116,11 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 15)
-        XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+        XCTAssertEqual(try store.viewContext.count(for: RSNetworkTaskEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerBlobHandleEntity.self), 7)
 
         // THEN data stored in external storage also persist
-        let request = try XCTUnwrap(store.viewContext.first(NetworkTaskEntity.self) {
+        let request = try XCTUnwrap(store.viewContext.first(RSNetworkTaskEntity.self) {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
@@ -141,11 +141,11 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 15)
-        XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+        XCTAssertEqual(try store.viewContext.count(for: RSNetworkTaskEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerBlobHandleEntity.self), 7)
 
         // THEN data stored in external storage also persist
-        let request = try XCTUnwrap(store.viewContext.first(NetworkTaskEntity.self) {
+        let request = try XCTUnwrap(store.viewContext.first(RSNetworkTaskEntity.self) {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
@@ -162,8 +162,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 10)
-        XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: RSNetworkTaskEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerBlobHandleEntity.self), 3)
     }
 
     func testInitWithPackageURLNoExtension() throws {
@@ -176,8 +176,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: RSLoggerMessageEntity.self), 10)
-        XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: RSNetworkTaskEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: RSLoggerBlobHandleEntity.self), 3)
     }
 
     // MARK: - Backward Compatibility
@@ -209,7 +209,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(task.url, "https://github.com/profile/valdo")
 
         // THEN blobs are readable
-        for blob in try store.viewContext.fetch(LoggerBlobHandleEntity.self) {
+        for blob in try store.viewContext.fetch(RSLoggerBlobHandleEntity.self) {
             let blob = try XCTUnwrap(blob.data)
             XCTAssertFalse(blob.isEmpty)
         }
@@ -242,7 +242,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(task.url, "https://github.com/repos/kean/Nuke")
 
         // THEN blobs are readable
-        for blob in try store.viewContext.fetch(LoggerBlobHandleEntity.self) {
+        for blob in try store.viewContext.fetch(RSLoggerBlobHandleEntity.self) {
             let blob = try XCTUnwrap(blob.data)
             XCTAssertFalse(blob.isEmpty)
         }
@@ -320,8 +320,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(messages.last?.text, "500")
 
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 501)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 1)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 1)
         context.reset()
 
         // WHEN
@@ -340,8 +340,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN metadata, network requests, blobs are removed
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 351)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweep() throws {
@@ -370,8 +370,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // ASSERT
         let context = store.backgroundContext
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 4)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 2)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 2)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 0)
         context.reset()
 
         // WHEN
@@ -380,9 +380,9 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // THEN session one is deleted
         XCTAssertEqual(try context.fetch(RSLoggerSessionEntity.self).map(\.id), [sessionTwoID])
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 2)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
-        XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 1)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskProgressEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
         XCTAssertEqual(try store.allTasks().first?.url, "example.com/kept")
@@ -403,8 +403,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(RSLoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
@@ -412,9 +412,9 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerMessageEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskProgressEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSNetworkTaskEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSNetworkTaskProgressEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsDeletedWhenBothEntitiesReferencingItAre() throws {
@@ -433,15 +433,15 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted2")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(RSLoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsKeptIfOnlyOneReferencingEntityIsDeleted() throws {
@@ -464,17 +464,17 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 2)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSNetworkTaskEntity.self), 2)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(RSLoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSNetworkTaskEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
     }
 
     func testBlobSizeLimitSweep() throws {
@@ -503,16 +503,16 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         storeRequest(id: "3", offset: -200)
 
         // ASSERT
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 3)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 3)
 
         // WHEN
         store.syncSweep()
 
         // THEN
-        let tasks = try store.backgroundContext.fetch(NetworkTaskEntity.self)
+        let tasks = try store.backgroundContext.fetch(RSNetworkTaskEntity.self)
         XCTAssertEqual(tasks.count, 3) // Keeps the requests
         XCTAssertEqual(tasks.compactMap(\.responseBody).count, 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
     }
 
     func testBlobSizeLimitSweepLargeBlob() throws {
@@ -528,8 +528,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
 
         // ASSERT it's stored in a file system
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        let request = try store.backgroundContext.first(NetworkTaskEntity.self)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
+        let request = try store.backgroundContext.first(RSNetworkTaskEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
         XCTAssertEqual(store.getBlobData(forKey: key.hexString), responseData)
 
@@ -537,7 +537,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.syncSweep()
 
         // THEN the file is deleted from the file system
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 0)
         XCTAssertNil(store.getBlobData(forKey: key.hexString))
     }
 
@@ -593,22 +593,22 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
         let context = store.viewContext
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 11)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 6)
-        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 5)
-        XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 3)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 3)
+        XCTAssertEqual(try context.count(for: RSNetworkRequestEntity.self), 6)
+        XCTAssertEqual(try context.count(for: RSNetworkResponseEntity.self), 5)
+        XCTAssertEqual(try context.count(for: RSNetworkTransactionMetricsEntity.self), 3)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 3)
 
         // WHEN
         store.removeAll()
 
         // THEN both message and metadata are removed
         XCTAssertEqual(try context.count(for: RSLoggerMessageEntity.self), 0)
-        XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
-        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
-        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)
-        XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkTaskEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkRequestEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkResponseEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSNetworkTransactionMetricsEntity.self), 0)
+        XCTAssertEqual(try context.count(for: RSLoggerBlobHandleEntity.self), 0)
     }
 
     func testRemoveAllWithLargeBlob() throws {
@@ -622,8 +622,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
 
         // ASSERT it's stored in a file system
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        let request = try store.backgroundContext.first(NetworkTaskEntity.self)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 1)
+        let request = try store.backgroundContext.first(RSNetworkTaskEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
         XCTAssertEqual(store.getBlobData(forKey: key.hexString), responseData)
 
@@ -631,7 +631,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.removeAll()
 
         // THEN the file is deleted from the file system
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: RSLoggerBlobHandleEntity.self), 0)
         XCTAssertNil(store.getBlobData(forKey: key.hexString))
 
         // WHEN store new files after removal
@@ -648,7 +648,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         populate(store: store)
 
         // THEN
-        let request = try XCTUnwrap(store.viewContext.first(NetworkTaskEntity.self) {
+        let request = try XCTUnwrap(store.viewContext.first(RSNetworkTaskEntity.self) {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/login")
         })
 
@@ -684,7 +684,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         store.storeRequest(URLRequest(url: url), response: response, error: nil, data: imageData)
 
         // THEN
-        let request = try XCTUnwrap(try store.backgroundContext.first(NetworkTaskEntity.self))
+        let request = try XCTUnwrap(try store.backgroundContext.first(RSNetworkTaskEntity.self))
         let processedData = try XCTUnwrap(request.responseBody?.data)
         let thumbnail = try XCTUnwrap(UIImage(data: processedData))
         XCTAssertEqual(thumbnail.size, CGSize(width: 512, height: 512))
@@ -769,8 +769,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         let info = try benchmark(title: "Open") {
             try LoggerStore(storeURL: copyURL)
         }
-        XCTAssertEqual(try info.viewContext.count(for: NetworkRequestEntity.self), 6000)
-        XCTAssertEqual(try info.viewContext.count(for: NetworkResponseEntity.self), 5000)
+        XCTAssertEqual(try info.viewContext.count(for: RSNetworkRequestEntity.self), 6000)
+        XCTAssertEqual(try info.viewContext.count(for: RSNetworkResponseEntity.self), 5000)
         XCTAssertEqual(try info.viewContext.count(for: RSLoggerMessageEntity.self), 10000)
     }
 }

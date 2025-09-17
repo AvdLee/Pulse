@@ -42,9 +42,9 @@ final class NetworkInspectorMetricsViewModel {
         NetworkInspectorTransactionViewModel(transaction: $0, task: task)
     }
 
-    private let task: NetworkTaskEntity
+    private let task: RSNetworkTaskEntity
 
-    init?(task: NetworkTaskEntity) {
+    init?(task: RSNetworkTaskEntity) {
         guard task.hasMetrics else { return nil }
         self.task = task
     }

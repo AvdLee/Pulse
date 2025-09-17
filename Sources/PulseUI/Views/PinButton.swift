@@ -33,7 +33,7 @@ struct PinView: View {
         self.message = message
     }
 
-    init(task: NetworkTaskEntity) {
+    init(task: RSNetworkTaskEntity) {
         self.init(message: task.message)
     }
 
@@ -63,7 +63,7 @@ final class PinButtonViewModel: ObservableObject {
         self.subscribe()
     }
 
-    init(_ task: NetworkTaskEntity) {
+    init(_ task: RSNetworkTaskEntity) {
         self.message = task.message
         self.pins = task.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()

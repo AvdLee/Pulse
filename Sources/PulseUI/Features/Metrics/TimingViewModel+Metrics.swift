@@ -6,11 +6,11 @@ import SwiftUI
 import Pulse
 
 extension TimingViewModel {
-    convenience init(task: NetworkTaskEntity) {
+    convenience init(task: RSNetworkTaskEntity) {
         self.init(sections: makeTimingSections(task: task))
     }
 
-    convenience init?(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
+    convenience init?(transaction: RSNetworkTransactionMetricsEntity, task: RSNetworkTaskEntity) {
         guard let interval = task.taskInterval else { // Anchor to task
             return nil
         }
@@ -22,7 +22,7 @@ extension TimingViewModel {
     }
 }
 
-private func makeTimingSections(task: NetworkTaskEntity) -> [TimingRowSectionViewModel] {
+private func makeTimingSections(task: RSNetworkTaskEntity) -> [TimingRowSectionViewModel] {
     guard let taskInterval = task.taskInterval else {
         return []
     }
@@ -61,7 +61,7 @@ private func _makeRow(title: String, color: UXColor, from: Date, to: Date?, task
     return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length)
 }
 
-private func makeTimingRows(transaction: NetworkTransactionMetricsEntity, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
+private func makeTimingRows(transaction: RSNetworkTransactionMetricsEntity, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
     var sections = [TimingRowSectionViewModel]()
 
     func makeRow(title: String, color: UXColor, from: Date, to: Date?) -> TimingRowViewModel {

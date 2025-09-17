@@ -10,7 +10,7 @@ import Pulse
 import Combine
 
 struct NetworkInspectorView: View {
-    @ObservedObject var task: NetworkTaskEntity
+    @ObservedObject var task: RSNetworkTaskEntity
 
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store

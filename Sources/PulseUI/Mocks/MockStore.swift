@@ -392,7 +392,7 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 }
 
 extension LoggerStore {
-    func entity(for task: MockTask) -> NetworkTaskEntity {
+    func entity(for task: MockTask) -> RSNetworkTaskEntity {
         var configuration = NetworkLogger.Configuration()
         configuration.isWaitingForDecoding = true
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))

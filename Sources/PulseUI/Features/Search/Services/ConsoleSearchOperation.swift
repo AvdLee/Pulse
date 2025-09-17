@@ -139,9 +139,9 @@ final class ConsoleSearchOperation {
         return occurrences.isEmpty ? nil : occurrences
     }
 
-    // MARK: Search (NetworkTaskEntity)
+    // MARK: Search (RSNetworkTaskEntity)
 
-    private func _search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+    private func _search(_ task: RSNetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         guard isMatching(task, filters: parameters.filters) else {
             return nil
         }
@@ -151,7 +151,7 @@ final class ConsoleSearchOperation {
         return search(in: task, parameters: parameters)
     }
 
-    private func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
+    private func isMatching(_ task: RSNetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
         Dictionary(grouping: filters.map(\.filter), by: \.name)
             .compactMap { $0.value as? ([any ConsoleSearchNetworkFilterProtocol]) }
             .allSatisfy { filters in
@@ -159,7 +159,7 @@ final class ConsoleSearchOperation {
             }
     }
 
-    private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+    private func search(in task: RSNetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
         let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
         for scope in scopes {
@@ -272,7 +272,7 @@ final class ConsoleSearchService {
         cache.removeAllObjects()
     }
 
-    func getBodyString(for blob: LoggerBlobHandleEntity) -> String? {
+    func getBodyString(for blob: RSLoggerBlobHandleEntity) -> String? {
         if let string = cache.object(forKey: blob.objectID)?.value {
             return string
         }

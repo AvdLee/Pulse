@@ -67,7 +67,7 @@ enum ConsoleFormatter {
         return label.capitalized
     }
 
-    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true, store: LoggerStore) -> String {
+    static func subheadline(for task: RSNetworkTaskEntity, hasTime: Bool = true, store: LoggerStore) -> String {
         return [
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
@@ -81,7 +81,7 @@ enum ConsoleFormatter {
     ///
     /// "GET · Pending"
     /// "GET · 21.9 MB · 2.2s"
-    static func details(for task: NetworkTaskEntity) -> String {
+    static func details(for task: RSNetworkTaskEntity) -> String {
         return [
             transferSize(for: task),
             duration(for: task),
@@ -99,7 +99,7 @@ enum ConsoleFormatter {
         }
     }
 
-    static func status(for task: NetworkTaskEntity, store: LoggerStore) -> String {
+    static func status(for task: RSNetworkTaskEntity, store: LoggerStore) -> String {
         guard let state = task.state(in: store) else {
             return "Unknown"
         }
@@ -113,7 +113,7 @@ enum ConsoleFormatter {
         }
     }
 
-    static func transferSize(for task: NetworkTaskEntity) -> String? {
+    static func transferSize(for task: RSNetworkTaskEntity) -> String? {
         guard task.state == .success else {
             return nil
         }
@@ -132,12 +132,12 @@ enum ConsoleFormatter {
         return nil
     }
 
-    static func duration(for task: NetworkTaskEntity) -> String? {
+    static func duration(for task: RSNetworkTaskEntity) -> String? {
         guard task.duration > 0 else { return nil }
         return DurationFormatter.string(from: task.duration, isPrecise: false)
     }
 
-    static func progress(for task: NetworkTaskEntity) -> String? {
+    static func progress(for task: RSNetworkTaskEntity) -> String? {
         ProgressViewModel.details(for: task)
     }
 }
@@ -160,7 +160,7 @@ enum StatusCodeFormatter {
 }
 
 enum ErrorFormatter {
-    static func shortErrorDescription(for task: NetworkTaskEntity) -> String {
+    static func shortErrorDescription(for task: RSNetworkTaskEntity) -> String {
         if task.errorCode != 0 {
             if task.errorDomain == URLError.errorDomain {
                 return descriptionForURLErrorCode(Int(task.errorCode))

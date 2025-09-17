@@ -54,7 +54,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         // THEN
         XCTAssertEqual(environment.mode, .network)
         XCTAssertEqual(sut.entities.count, 8)
-        XCTAssertTrue(sut.entities is [NetworkTaskEntity])
+        XCTAssertTrue(sut.entities is [RSNetworkTaskEntity])
     }
 
     // MARK: Grouping
@@ -234,8 +234,8 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 }
 
 private func isOrderedBefore(_ lhs: NSManagedObject, _ rhs: NSManagedObject) -> Bool {
-    let lhs = (lhs as? RSLoggerMessageEntity)?.createdAt ?? (lhs as? NetworkTaskEntity)!.createdAt
-    let rhs = (rhs as? RSLoggerMessageEntity)?.createdAt ?? (rhs as? NetworkTaskEntity)!.createdAt
+    let lhs = (lhs as? RSLoggerMessageEntity)?.createdAt ?? (lhs as? RSNetworkTaskEntity)!.createdAt
+    let rhs = (rhs as? RSLoggerMessageEntity)?.createdAt ?? (rhs as? RSNetworkTaskEntity)!.createdAt
 #if os(macOS)
     return lhs < rhs
 #else

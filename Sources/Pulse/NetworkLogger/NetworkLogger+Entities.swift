@@ -40,7 +40,7 @@ extension NetworkLogger {
                 if request.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
             }
             
-            init(_ entity: NetworkRequestEntity) {
+            init(_ entity: RSNetworkRequestEntity) {
                 self = []
                 if entity.allowsCellularAccess { insert(.allowsCellularAccess) }
                 if entity.allowsExpensiveNetworkAccess { insert(.allowsExpensiveNetworkAccess) }
@@ -59,7 +59,7 @@ extension NetworkLogger {
             self.options = Options(urlRequest)
         }
         
-        init(_ entity: NetworkRequestEntity) {
+        init(_ entity: RSNetworkRequestEntity) {
             self.url = entity.url.flatMap(URL.init)
             self.httpMethod = entity.httpMethod
             self.headers = entity.headers
@@ -88,7 +88,7 @@ extension NetworkLogger {
             self.headers = httpResponse?.allHeaderFields as? [String: String]
         }
         
-        init(_ entity: NetworkResponseEntity) {
+        init(_ entity: RSNetworkResponseEntity) {
             self.statusCode = Int(entity.statusCode)
             self.headers = entity.headers
         }
@@ -292,7 +292,7 @@ extension NetworkLogger {
                 if metrics.isMultipath { insert(.isMultipath) }
             }
             
-            init(_ entity: NetworkTransactionMetricsEntity) {
+            init(_ entity: RSNetworkTransactionMetricsEntity) {
                 self = []
                 if entity.isProxyConnection { insert(.isProxyConnection) }
                 if entity.isReusedConnection { insert(.isReusedConnection) }
@@ -303,7 +303,7 @@ extension NetworkLogger {
             }
         }
         
-        init(_ entity: NetworkTransactionMetricsEntity) {
+        init(_ entity: RSNetworkTransactionMetricsEntity) {
             self.request = NetworkLogger.Request(entity.request)
             self.response = entity.response.map(NetworkLogger.Response.init)
             self.timing = entity.timing

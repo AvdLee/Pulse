@@ -66,7 +66,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(task.httpMethod, "GET")
         XCTAssertNil(task.errorDomain)
         XCTAssertEqual(task.errorCode, 0)
-        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
+        XCTAssertEqual(task.requestState, RSNetworkTaskEntity.State.success.rawValue)
 
         let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")
@@ -145,7 +145,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(task.httpMethod, "GET")
         XCTAssertNil(task.errorDomain)
         XCTAssertEqual(task.errorCode, 0)
-        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
+        XCTAssertEqual(task.requestState, RSNetworkTaskEntity.State.success.rawValue)
 
         let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")

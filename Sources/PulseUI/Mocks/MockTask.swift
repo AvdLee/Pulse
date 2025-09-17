@@ -38,7 +38,7 @@ struct MockTask {
 }
 
 extension MockTask {
-    static let allEntities: [NetworkTaskEntity]  = MockTask.allTasks.map(LoggerStore.preview.entity)
+    static let allEntities: [RSNetworkTaskEntity]  = MockTask.allTasks.map(LoggerStore.preview.entity)
 
     static var allTasks: [MockTask] = [.login, .profile, .repos, .octocat, .downloadNuke, .createAPI, .uploadPulseArchive, .patchRepo]
 

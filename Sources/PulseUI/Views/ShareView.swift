@@ -104,7 +104,7 @@ struct ShareView: View {
 
 #if os(macOS)
 struct ShareNetworkTaskView: View {
-    @ObservedObject var task: NetworkTaskEntity
+    @ObservedObject var task: RSNetworkTaskEntity
 
     @AppStorage("com-github-kean-selected-task-sharing-option") private var output: Output = .plainText
 

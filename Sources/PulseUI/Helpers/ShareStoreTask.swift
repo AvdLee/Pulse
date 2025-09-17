@@ -99,9 +99,9 @@ final class ShareStoreTask {
     private func prerenderResponseBodies() {
         var jobs: [NSManagedObjectID: RenderBodyJob] = [:]
 
-        func enqueueJob(for blob: LoggerBlobHandleEntity, error: NetworkLogger.DecodingError?) {
+        func enqueueJob(for blob: RSLoggerBlobHandleEntity, error: NetworkLogger.DecodingError?) {
             jobs[blob.objectID] = RenderBodyJob(
-                data: LoggerBlobHandleEntity.getData(for: blob, store: store),
+                data: RSLoggerBlobHandleEntity.getData(for: blob, store: store),
                 contentType: blob.contentType,
                 error: error
             )

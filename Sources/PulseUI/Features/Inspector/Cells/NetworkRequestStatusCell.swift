@@ -58,13 +58,13 @@ struct NetworkRequestStatusCellModel {
     let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    init(task: RSNetworkTaskEntity, store: LoggerStore) {
         self.status = StatusLabelViewModel(task: task, store: store)
         self.duration = DurationViewModel(task: task)
         self.isMock = task.isMocked
     }
 
-    init(transaction: NetworkTransactionMetricsEntity) {
+    init(transaction: RSNetworkTransactionMetricsEntity) {
         status = StatusLabelViewModel(transaction: transaction)
         duration = DurationViewModel(transaction: transaction)
         isMock = false
@@ -91,7 +91,7 @@ private final class DurationViewModel: ObservableObject {
 
     private weak var timer: Timer?
 
-    init(task: NetworkTaskEntity) {
+    init(task: RSNetworkTaskEntity) {
         switch task.state {
         case .pending:
             // TODO: Update in sync with the object (creation date is not the same as fetch start date)
@@ -104,14 +104,14 @@ private final class DurationViewModel: ObservableObject {
         }
     }
 
-    init?(transaction: NetworkTransactionMetricsEntity) {
+    init?(transaction: RSNetworkTransactionMetricsEntity) {
         guard let duration = transaction.timing.duration else {
             return nil
         }
         self.duration = DurationFormatter.string(from: duration, isPrecise: false)
     }
 
-    private func refreshPendingDuration(task: NetworkTaskEntity) {
+    private func refreshPendingDuration(task: RSNetworkTaskEntity) {
         let duration = Date().timeIntervalSince(task.createdAt)
         if duration > 0 {
             self.duration = DurationFormatter.string(from: duration, isPrecise: false)

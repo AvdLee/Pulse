@@ -47,7 +47,7 @@ final class LoggerStoreIndex: ObservableObject {
     private func prepopulate() {
         let files = store.backgroundContext.getDistinctValues(entityName: "RSLoggerMessageEntity", property: "file")
         let labels = store.backgroundContext.getDistinctValues(entityName: "RSLoggerMessageEntity", property: "label")
-        let urls = store.backgroundContext.getDistinctValues(entityName: "NetworkTaskEntity", property: "url")
+        let urls = store.backgroundContext.getDistinctValues(entityName: "RSNetworkTaskEntity", property: "url")
 
         var hosts = Set<String>()
         var paths = Set<String>()

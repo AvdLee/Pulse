@@ -26,7 +26,7 @@ extension ConsoleFilers {
     ) -> NSPredicate? {
         var predicates = [NSPredicate]()
         if isOnlyErrors {
-            predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
+            predicates.append(NSPredicate(format: "requestState == %d", RSNetworkTaskEntity.State.failure.rawValue))
         }
         predicates += makePredicates(for: criteria.shared, isNetwork: true)
         predicates += makePredicates(for: criteria.network)

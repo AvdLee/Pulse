@@ -30,7 +30,7 @@ final class TextRenderer {
 
     let helper: TextHelper
 
-    /// LoggerBlobHandleEntity.objectID: string
+    /// RSLoggerBlobHandleEntity.objectID: string
     var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
     private var string = NSMutableAttributedString()
 
@@ -86,7 +86,7 @@ final class TextRenderer {
         }
     }
 
-    func render(_ task: NetworkTaskEntity, content: NetworkContent, store: LoggerStore) {
+    func render(_ task: RSNetworkTaskEntity, content: NetworkContent, store: LoggerStore) {
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task, store: store)
         } else if content.contains(.header) {
@@ -158,7 +158,7 @@ final class TextRenderer {
         string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
-    private func renderLargeHeader(for task: NetworkTaskEntity, store: LoggerStore) {
+    private func renderLargeHeader(for task: RSNetworkTaskEntity, store: LoggerStore) {
         let status = NetworkRequestStatusCellModel(task: task, store: store)
 
         let suffix = status.isMock ? " (mock)" : ""
@@ -171,7 +171,7 @@ final class TextRenderer {
         addSpacer()
     }
 
-    private func renderHeader(for task: NetworkTaskEntity, store: LoggerStore) {
+    private func renderHeader(for task: RSNetworkTaskEntity, store: LoggerStore) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -183,7 +183,7 @@ final class TextRenderer {
         addSpacer()
     }
 
-    func renderCompact(_ task: NetworkTaskEntity, store: LoggerStore) {
+    func renderCompact(_ task: RSNetworkTaskEntity, store: LoggerStore) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -200,7 +200,7 @@ final class TextRenderer {
         string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
     }
 
-    func render(_ transaction: NetworkTransactionMetricsEntity) {
+    func render(_ transaction: RSNetworkTransactionMetricsEntity) {
         do {
             let status = StatusLabelViewModel(transaction: transaction)
             let method = transaction.request.httpMethod ?? "GET"
@@ -238,7 +238,7 @@ final class TextRenderer {
         render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
     }
 
-    private func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderRequestBody(for task: RSNetworkTaskEntity) -> NSAttributedString {
         if let body = task.requestBody, let string = renderedBodies[body.objectID] {
             return string
         }
@@ -251,7 +251,7 @@ final class TextRenderer {
         }
     }
 
-    private func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderResponseBody(for task: RSNetworkTaskEntity) -> NSAttributedString {
         if let body = task.responseBody, let string = renderedBodies[body.objectID] {
             return string
         }
@@ -268,7 +268,7 @@ final class TextRenderer {
         TextRendererJSON(json: json, error: error, options: options).render()
     }
 
-    func render(_ blob: LoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    func render(_ blob: RSLoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let string = render(data, contentType: contentType, error: error)
         renderedBodies[blob.objectID] = string
         return string

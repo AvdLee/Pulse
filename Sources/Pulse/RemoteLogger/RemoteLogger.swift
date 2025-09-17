@@ -470,7 +470,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connection?.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
     }
     
-    public func showDetails(for task: NetworkTaskEntity) {
+    public func showDetails(for task: RSNetworkTaskEntity) {
         connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
     }
     

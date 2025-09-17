@@ -85,7 +85,7 @@ extension HARDocument {
         let time: Double
         let timings: Timings?
         
-        init(entity: NetworkTaskEntity, pageId: String) {
+        init(entity: RSNetworkTaskEntity, pageId: String) {
             cache = .init()
             connection = "\(entity.orderedTransactions.first?.remotePort ?? .zero)"
             pageref = pageId
@@ -187,7 +187,7 @@ extension HARDocument.Entry {
         let status: Int
         var statusText: String
         
-        init?(_ entity: NetworkTaskEntity?) {
+        init?(_ entity: RSNetworkTaskEntity?) {
             if let entity {
                 bodySize = Int(entity.responseBody?.size ?? -1)
                 content = .init(entity.responseBody)
@@ -211,7 +211,7 @@ extension HARDocument.Entry {
         let size: Int
         var text: String = ""
         
-        init?(_ entity: LoggerBlobHandleEntity?) {
+        init?(_ entity: RSLoggerBlobHandleEntity?) {
             if let entity {
                 compression = Int(entity.size - entity.decompressedSize)
                 encoding = ""

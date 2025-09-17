@@ -4,7 +4,7 @@
 
 import Foundation
 
-extension NetworkTaskEntity {
+extension RSNetworkTaskEntity {
     public func cURLDescription() -> String {
         guard let request = currentRequest ?? originalRequest,
               let url = request.url else {

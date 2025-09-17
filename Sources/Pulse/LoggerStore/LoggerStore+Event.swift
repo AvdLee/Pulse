@@ -118,7 +118,7 @@ extension LoggerStore {
                 self.taskDescription = taskDescription
             }
             
-            init(_ entity: NetworkTaskEntity) {
+            init(_ entity: RSNetworkTaskEntity) {
                 self.taskId = entity.taskId
                 self.taskType = NetworkLogger.TaskType(rawValue: entity.taskType) ?? .dataTask
                 self.createdAt = entity.createdAt

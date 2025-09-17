@@ -101,7 +101,7 @@ struct ConsoleSearchResultView: View {
 
 #if os(iOS) || os(visionOS)
     @ViewBuilder
-    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
+    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: RSNetworkTaskEntity) -> some View {
         switch occurrence.scope {
         case .originalRequestHeaders:
             makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
@@ -119,7 +119,7 @@ struct ConsoleSearchResultView: View {
     }
 #else
     @ViewBuilder
-    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
+    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: RSNetworkTaskEntity) -> some View {
         switch occurrence.scope {
         case .originalRequestHeaders:
             NetworkInspectorView(task: task, tab: .headers)
